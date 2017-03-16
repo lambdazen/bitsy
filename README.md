@@ -1,6 +1,6 @@
 Bitsy is a small, fast, embeddable, durable in-memory graph database that is compatible with Tinkerpop3. 
 
-[The project Wiki](https://github.com/lambdazen/bitsy3/wiki) is the official source of documentation. The original version of the database compatible with Tinkerpop2 is available at https://bitbucket.org/lambdazen/bitsy. 
+[The project Wiki](https://github.com/lambdazen/bitsy/wiki) is the official source of documentation. The original version of the database compatible with Tinkerpop2 is available at https://bitbucket.org/lambdazen/bitsy. 
 
 ### Git branching strategy
 
