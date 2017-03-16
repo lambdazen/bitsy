@@ -1,0 +1,44 @@
+H=3#0021a605
+V={"id":"4939a570-2fc3-49c4-a88c-8dbf995ca059","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#cbe9c5f7
+V={"id":"62c59bfe-954b-4a8d-b166-79b0394db432","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#b3f98903
+V={"id":"cae53026-792f-4758-8836-82ef253b758b","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#be0fdd1f
+V={"id":"0a423fea-ed66-4151-ac85-a16d28603099","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#46d8619c
+V={"id":"7441ee87-ed85-4c7b-a6b7-9ef828a8ae66","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#55891ca4
+V={"id":"9dea9b70-22a7-4d66-b543-763d39e74ac3","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#6901f89a
+V={"id":"bdf65c96-20b5-4418-9e27-2525e6ce9d64","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#be873f0c
+V={"id":"a6a428fe-b6d2-427a-8674-41735bed89a1","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#36cd8ba2
+V={"id":"5711a7cb-3025-4fad-8605-28d12a08e6a2","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#22c63a3b
+V={"id":"ff60fb22-f142-435c-a1e9-dad78968e99d","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#20e7c528
+V={"id":"f390e034-c346-44c4-a919-bc45c615e70d","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#1b0707a2
+V={"id":"6a27512d-9d8b-4190-87ec-cd4dc8f8964d","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#f5a3412b
+V={"id":"91957136-002a-47e4-8351-a45531dd374b","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#8d403c50
+V={"id":"0f73f23a-4113-48c1-ba3f-1596a2ed325e","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#581ea883
+V={"id":"893f6b99-7da4-4d2d-8660-b3025ef094d4","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#c97c97ce
+V={"id":"53ccbd4a-1071-4dd4-9797-cf9820d30f97","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#eadd8e95
+V={"id":"29b633c4-791d-4084-ac52-112bab10e8d0","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#79a97e91
+V={"id":"5e32e7c0-3097-4af3-8534-41b00e5c2075","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#abd83757
+V={"id":"061aa8c7-3d4d-42a9-bf2c-5b41bf7c3334","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#a7bb8ad4
+V={"id":"ef292fa8-42c6-4d7d-b664-be4ecdc9a334","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#d7092785
+V={"id":"202a0cc9-de3e-45c5-b09d-ee5dfbf9f446","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#ecb86525
+V={"id":"204ffb01-4a52-41a1-bf62-ac8573f069e6","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#3f13c007
+V={"id":"6fe4d83c-e4a4-4195-9618-8a9b8dcdeabe","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#4c17785c
+V={"id":"282e4ee9-15be-45de-be85-f7e5541b504f","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#0617b779
+V={"id":"10df704b-c692-4934-836b-05937ffefd4e","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#c0e9f439
+L=2#00237762
+V={"id":"1bcbe6d7-6c47-447e-b268-30f45e91d569","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#e934a569
+V={"id":"0c73d06c-57f1-4bf2-9f26-3e5bfbd6fb5a","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#99a8d417
+V={"id":"a095ae24-9764-4f3a-8925-c2553c7bdf0a","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#e551cdc2
+V={"id":"da27b121-cf6f-4062-8320-4a73e5bd5579","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#acb3edd7
+V={"id":"a14c8381-b950-4cad-b4c9-c6e6e23de413","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#9a27f052
+V={"id":"b820a339-9a45-44b3-a40d-25347c50c1fb","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#d5f4c62e
+V={"id":"2bdd4ed5-e0be-4f73-8842-56aba2b0d788","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#ff1615c8
+V={"id":"82146009-6c33-433e-a28c-62f59abf6bdd","v":1,"s":"M","p":{"foo":"something \n multi-line"}}#941e52e5
+V={"id":"7735542b-7a75-4262-b448-5195f286bac8","v":1ሰማይ አይታረስ ንጉሥ አይከሰስ።
+  ብላ ካለኝ እንደአባቴ በቆመጠኝ።
+  ጌጥ ያለቤቱ ቁምጥና ነው።
+  ደሀ በሕልሙ ቅቤ ባይጠጣ ንጣት በገደለው።
+  የአፍ ወለምታ በቅቤ አይታሽም።
+  አይጥ በበላ ዳዋ ተመታ።
+  ሲተረጉሙ ይደረግሙ።
+  ቀስ በቀስ፥ ዕንቁላል በእግሩ ይሄዳል።
+  ድር ቢያብር አንበሳ ያስር።

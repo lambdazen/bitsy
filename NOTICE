@@ -1,0 +1,21 @@
+This product depends on the following components: 
+
+- Tinkerpop Gremlin (gremlin-core, gremlin-test)
+    http://tinkerpop.apache.org/
+    Apache 2.0 license
+    Copyright (c) 2015- The Apache Software Foundation.
+
+- Jackson JSON processor (jackson-core, jackson-databind)
+    https://github.com/FasterXML/
+    Apache 2.0 license
+    Copyright (c) 2007- Tatu Saloranta, tatu.saloranta@iki.fi
+    
+- Ness Computing Core Component (components-ness-core)
+    https://github.com/NessComputing/components-ness-core
+    Apache 2.0 license
+    Copyright (C) 2012- Ness Computing, Inc.
+    
+- SLF4J API (slf4j-api)
+    http://www.slf4j.org/
+    MIT license
+    Copyright (c) 2004- QOS.ch 
