@@ -7,7 +7,8 @@ import org.apache.tinkerpop.gremlin.structure.Vertex;
 import com.lambdazen.bitsy.store.Record;
 import com.lambdazen.bitsy.store.Record.RecordType;
 
-public class BitsyMemGraphTest extends BitsyGraphTest {
+public class BitsyMemGraphIT extends BitsyGraphIT
+{
     public boolean isPersistent() {
         return false;
     }
