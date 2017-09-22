@@ -32,7 +32,7 @@ import org.apache.tinkerpop.gremlin.structure.Property;
 import com.lambdazen.bitsy.store.FileBackedMemoryGraphStore;
 import com.lambdazen.bitsy.util.CommittableFileLog;
 
-public class BitsyGraphTest extends FileBasedTestCase {
+public class BitsyGraphIT extends FileBasedTestCase {
     Graph graph;
     Path dbPath;
     Random rand = new Random();

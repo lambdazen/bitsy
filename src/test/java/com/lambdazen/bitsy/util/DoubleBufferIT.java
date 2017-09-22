@@ -6,12 +6,12 @@ import com.lambdazen.bitsy.BitsyErrorCodes;
 import com.lambdazen.bitsy.BitsyException;
 import com.lambdazen.bitsy.util.DoubleBuffer.BufferName;
 
-public class DoubleBufferTest extends TestCase {
+public class DoubleBufferIT extends TestCase {
     // Temp vars used in inner classes
     int count;
     int potFn;
     
-    public DoubleBufferTest() {
+    public DoubleBufferIT() {
         
     }
     
