@@ -1,12 +1,9 @@
 package com.lambdazen.bitsy.structure;
 
+import com.lambdazen.bitsy.BitsyGraph;
 import org.apache.tinkerpop.gremlin.AbstractGremlinSuite;
 import org.apache.tinkerpop.gremlin.GraphProviderClass;
-import org.apache.tinkerpop.gremlin.process.ProcessStandardSuite;
-import org.apache.tinkerpop.gremlin.process.traversal.CoreTraversalTest;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalEngine;
-import org.apache.tinkerpop.gremlin.process.traversal.TraversalInterruptionTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.ComplexTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.branch.BranchTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.branch.ChooseTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.branch.LocalTest;
@@ -34,11 +31,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.map.ConstantTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.CountTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.FlatMapTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.FoldTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.LoopsTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapKeysTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.map.MapValuesTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MatchTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MaxTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.MeanTest;
@@ -54,10 +48,8 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.map.UnfoldTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.ValueMapTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.VertexTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.AggregateTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.ExplainTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.GroupCountTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.GroupTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.GroupTestV3d0;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.InjectTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SackTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SideEffectCapTest;
@@ -65,17 +57,9 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SideEffect
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.StoreTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SubgraphTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.TreeTest;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.ElementIdStrategyProcessTest;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.EventStrategyProcessTest;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.PartitionStrategyProcessTest;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.SubgraphStrategyProcessTest;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.decoration.TranslationStrategyProcessTest;
-import org.apache.tinkerpop.gremlin.process.traversal.strategy.verification.ReadOnlyStrategyProcessTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.RunnerBuilder;
-
-import com.lambdazen.bitsy.BitsyGraph;
 
 @RunWith(BitsyProcessStandardTestSuite.class)
 @GraphProviderClass(provider = BitsyTestGraphProvider.class, graph = BitsyGraph.class)
@@ -207,8 +191,8 @@ public class BitsyProcessStandardTestSuite extends AbstractGremlinSuite {
             FoldTest.class,
             LoopsTest.class,
             MapTest.class,
-            MapKeysTest.class,
-            MapValuesTest.class,
+            //MapKeysTest.class,
+            //MapValuesTest.class,
             MatchTest.class,
             MaxTest.class,
             MeanTest.class,

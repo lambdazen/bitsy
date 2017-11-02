@@ -11,7 +11,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>Bitsy Graph Database</name>
@@ -40,8 +40,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- versions -->
-    <gremlin.version>3.2.6</gremlin.version>
-    <jackson.version>2.9.1</jackson.version>
+    <gremlin.version>3.3.0</gremlin.version>
+    <jackson.version>2.9.2</jackson.version>
   </properties>
 
   <repositories>
@@ -95,6 +95,10 @@
             <java.awt.headless>true</java.awt.headless>
             <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
           </systemPropertyVariables>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*TestCase.java</include>
+          </includes>
         </configuration>
       </plugin>
 
@@ -113,6 +117,11 @@
             <java.awt.headless>true</java.awt.headless>
             <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
           </systemPropertyVariables>
+          <includes>
+            <include>**/*IT.java</include>
+            <include>**/*ITCase.java</include>
+            <include>**/*TestSuite.java</include>
+          </includes>
         </configuration>
       </plugin>
 

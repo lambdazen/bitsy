@@ -510,11 +510,6 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 
     // Added for Tinkerpop 3    
 	@Override
-	public <R> Workload<R> submit(Function<Graph, R> work) {
-		return new Workload<>(graph, work);
-	}
-
-	@Override
 	public void readWrite() {
 		context.getReadWriteConsumer().accept(this);
 	}
