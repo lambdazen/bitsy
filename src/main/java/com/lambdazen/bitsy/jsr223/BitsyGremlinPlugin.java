@@ -3,6 +3,7 @@ package com.lambdazen.bitsy.jsr223;
 import com.lambdazen.bitsy.BitsyEdge;
 import com.lambdazen.bitsy.BitsyElement;
 import com.lambdazen.bitsy.BitsyGraph;
+import com.lambdazen.bitsy.BitsyIoRegistryV3d0;
 import com.lambdazen.bitsy.BitsyProperty;
 import com.lambdazen.bitsy.BitsyVertex;
 import com.lambdazen.bitsy.BitsyVertexProperty;
@@ -18,9 +19,10 @@ public class BitsyGremlinPlugin
 {
   private static final String NAME = "lambdazen.bitsy";
 
-  private static final ImportCustomizer imports() {
+  private static ImportCustomizer imports() {
     return DefaultImportCustomizer.build()
-        .addClassImports(BitsyEdge.class,
+        .addClassImports(
+            BitsyEdge.class,
             BitsyElement.class,
             BitsyGraph.class,
             ThreadedBitsyGraph.class,
@@ -28,12 +30,14 @@ public class BitsyGremlinPlugin
             BitsyVertex.class,
             BitsyVertexProperty.class,
             UUID.class,
-            BitsyTransaction.class).create();
+            BitsyTransaction.class,
+            BitsyIoRegistryV3d0.class
+        ).create();
   }
 
   private static final BitsyGremlinPlugin INSTANCE = new BitsyGremlinPlugin();
 
-  public BitsyGremlinPlugin() {
+  private BitsyGremlinPlugin() {
     super(NAME, imports());
   }
 

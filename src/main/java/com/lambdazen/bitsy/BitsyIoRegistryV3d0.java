@@ -1,0 +1,39 @@
+package com.lambdazen.bitsy;
+
+import org.apache.tinkerpop.gremlin.structure.io.AbstractIoRegistry;
+import org.apache.tinkerpop.gremlin.structure.io.gryo.GryoIo;
+import org.apache.tinkerpop.shaded.kryo.Kryo;
+import org.apache.tinkerpop.shaded.kryo.Serializer;
+import org.apache.tinkerpop.shaded.kryo.io.Input;
+import org.apache.tinkerpop.shaded.kryo.io.Output;
+
+public class BitsyIoRegistryV3d0
+    extends AbstractIoRegistry
+{
+  private static final BitsyIoRegistryV3d0 INSTANCE = new BitsyIoRegistryV3d0();
+
+  private BitsyIoRegistryV3d0() {
+    register(GryoIo.class, UUID.class, new UUIDGryoSerializer());
+  }
+
+  public static BitsyIoRegistryV3d0 instance() {
+    return INSTANCE;
+  }
+
+  final static class UUIDGryoSerializer
+      extends Serializer<UUID>
+  {
+    @Override
+    public void write(final Kryo kryo, final Output output, final UUID uuid) {
+      output.writeLong(uuid.getMostSignificantBits());
+      output.writeLong(uuid.getLeastSignificantBits());
+    }
+
+    @Override
+    public UUID read(final Kryo kryo, final Input input, final Class<UUID> aClass) {
+      long msb = input.readLong();
+      long lsb = input.readLong();
+      return new UUID(msb, lsb);
+    }
+  }
+}
