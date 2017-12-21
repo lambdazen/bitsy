@@ -7,6 +7,7 @@ import com.lambdazen.bitsy.BitsyProperty;
 import com.lambdazen.bitsy.BitsyVertex;
 import com.lambdazen.bitsy.BitsyVertexProperty;
 import com.lambdazen.bitsy.ThreadedBitsyGraph;
+import com.lambdazen.bitsy.UUID;
 import com.lambdazen.bitsy.tx.BitsyTransaction;
 import org.apache.tinkerpop.gremlin.jsr223.AbstractGremlinPlugin;
 import org.apache.tinkerpop.gremlin.jsr223.DefaultImportCustomizer;
@@ -26,6 +27,7 @@ public class BitsyGremlinPlugin
             BitsyProperty.class,
             BitsyVertex.class,
             BitsyVertexProperty.class,
+            UUID.class,
             BitsyTransaction.class).create();
   }
 
