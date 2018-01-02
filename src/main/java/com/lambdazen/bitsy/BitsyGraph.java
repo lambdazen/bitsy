@@ -22,6 +22,9 @@ import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.apache.tinkerpop.gremlin.structure.io.Io;
+import org.apache.tinkerpop.gremlin.structure.io.graphson.GraphSONVersion;
+import org.apache.tinkerpop.gremlin.structure.io.gryo.GryoVersion;
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -337,6 +340,11 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
     @Override
     public GraphComputer compute(Class graphComputerClass) {
     	throw new UnsupportedOperationException("Bitsy doesn't support the compute() method", new BitsyException(BitsyErrorCodes.NO_OLAP_SUPPORT));
+    }
+
+    @Override
+    public <I extends Io> I io(final Io.Builder<I> builder) {
+        return (I) builder.graph(this).onMapper(m -> m.addRegistry(BitsyIoRegistryV3d0.instance())).create();
     }
 
     /* FEATURES */
