@@ -37,7 +37,7 @@ public class BitsyGremlinPlugin
 
   private static final BitsyGremlinPlugin INSTANCE = new BitsyGremlinPlugin();
 
-  private BitsyGremlinPlugin() {
+  public BitsyGremlinPlugin() {
     super(NAME, imports());
   }
 
