@@ -1,4 +1,4 @@
-![Bitsy Logo][https://lambdazen.com/bitsy/BitsyLogoSmall.png]
+![Bitsy Logo](https://lambdazen.com/bitsy/BitsyLogoSmall.png)
 
 Bitsy is a small, fast, embeddable, durable in-memory graph database that is compatible with Tinkerpop3. 
 
