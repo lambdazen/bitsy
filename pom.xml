@@ -98,6 +98,7 @@
           <includes>
             <include>**/*Test.java</include>
             <include>**/*TestCase.java</include>
+<!--            <include>**/*TestSuite.java</include> -->
           </includes>
         </configuration>
       </plugin>
