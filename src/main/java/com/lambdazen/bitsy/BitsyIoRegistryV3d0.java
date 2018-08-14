@@ -1,5 +1,7 @@
 package com.lambdazen.bitsy;
 
+import com.lambdazen.bitsy.store.EdgeBean;
+import com.lambdazen.bitsy.store.VertexBean;
 import org.apache.tinkerpop.gremlin.structure.io.AbstractIoRegistry;
 import org.apache.tinkerpop.gremlin.structure.io.gryo.GryoIo;
 import org.apache.tinkerpop.shaded.kryo.Kryo;
@@ -14,6 +16,8 @@ public class BitsyIoRegistryV3d0
 
   private BitsyIoRegistryV3d0() {
     register(GryoIo.class, UUID.class, new UUIDGryoSerializer());
+    register(GryoIo.class, VertexBean.class, new UUIDGryoSerializer());
+    register(GryoIo.class, EdgeBean.class, new UUIDGryoSerializer());
   }
 
   public static BitsyIoRegistryV3d0 instance() {
