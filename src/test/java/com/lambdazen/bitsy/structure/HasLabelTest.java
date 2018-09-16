@@ -1,3 +1,5 @@
+package com.lambdazen.bitsy.structure;
+
 import com.lambdazen.bitsy.BitsyGraph;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.structure.Graph;
