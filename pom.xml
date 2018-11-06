@@ -11,7 +11,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.0.4-SNAPSHOT</version>
+  <version>3.0.4</version>
 
   <name>Bitsy Graph Database</name>
   <description>
@@ -273,6 +273,13 @@
       <version>1.9.1</version>
     </dependency>
 
+<!-- UNCOMMENT IF REQUIRE -->
+	<dependency>
+	    <groupId>com.google.guava</groupId>
+	    <artifactId>guava</artifactId>
+	    <version>13.0</version>
+	</dependency>
+
     <!-- Test dependencies -->
 
     <dependency>
@@ -295,6 +302,23 @@
       <version>${gremlin.version}</version>
       <scope>test</scope>
     </dependency>
+
+<!-- TODO: UNCOMMENT WHEN ADDING GREMLIN SERVER TESTS  
+    <dependency>
+      <groupId>org.apache.tinkerpop</groupId>
+      <artifactId>gremlin-server</artifactId>
+      <version>${gremlin.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tinkerpop</groupId>
+      <artifactId>gremlin-driver</artifactId>
+      <version>${gremlin.version}</version>
+      <scope>test</scope>
+    </dependency>
+ -->
+ 
   </dependencies>
 
   <profiles>
