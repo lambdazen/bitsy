@@ -5,14 +5,13 @@
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
-    <version>7</version>
+    <version>9</version>
     <relativePath/>
   </parent>
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.0.4-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <version>3.1.1-SNAPSHOT</version>
 
   <name>Bitsy Graph Database</name>
   <description>
@@ -40,8 +39,11 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- versions -->
-    <gremlin.version>3.3.0</gremlin.version>
-    <jackson.version>2.9.2</jackson.version>
+    <gremlin.version>3.3.4</gremlin.version>
+    <jackson.version>2.9.7</jackson.version>
+
+    <!-- JaCoCo: empty -->
+    <jacocoAgentArg></jacocoAgentArg>
   </properties>
 
   <repositories>
@@ -56,18 +58,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.2</version>
+        <version>3.8.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -77,18 +79,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.0</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.20.1</version>
+        <version>2.22.1</version>
         <configuration>
           <forkMode>once</forkMode>
           <reuseForks>false</reuseForks>
           <forkCount>1</forkCount>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>-XX:-UseSplitVerifier</argLine>
+          <argLine>@{jacocoAgentArg} -XX:-UseSplitVerifier</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
@@ -105,13 +107,13 @@
 
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.20.1</version>
+        <version>2.22.1</version>
         <configuration>
           <forkMode>once</forkMode>
           <reuseForks>false</reuseForks>
           <forkCount>1</forkCount>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>-XX:-UseSplitVerifier</argLine>
+          <argLine>@{jacocoAgentArg} -XX:-UseSplitVerifier</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
@@ -129,13 +131,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
-        <version>2.5.2</version>
+        <version>3.0.0-M1</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>2.8.2</version>
+        <version>3.0.0-M1</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
       </plugin>
 
       <plugin>
@@ -155,10 +163,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>3.0.1</version>
         <configuration>
           <!-- Turn off strict javadoc checks in Java-8 -->
-          <additionalparam>-Xdoclint:none</additionalparam>
+          <doclint>none</doclint>
         </configuration>
       </plugin>
 
@@ -181,13 +189,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.7.1</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.4.1</version>
+        <version>3.0.0-M2</version>
         <configuration>
           <rules>
             <requireMavenVersion>
@@ -200,8 +208,19 @@
         </configuration>
       </plugin>
 
-      <plugin> 
-        <artifactId>maven-dependency-plugin</artifactId> 
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <configuration>
+          <propertyName>jacocoAgentArg</propertyName>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.1.1</version>
         <executions> 
           <execution> 
             <phase>install</phase> 
@@ -251,8 +270,15 @@
     <dependency>
       <groupId>com.nesscomputing.components</groupId>
       <artifactId>ness-core</artifactId>
-      <version>1.8.0</version>
+      <version>1.9.1</version>
     </dependency>
+
+<!-- UNCOMMENT IF REQUIRE -->
+	<dependency>
+	    <groupId>com.google.guava</groupId>
+	    <artifactId>guava</artifactId>
+	    <version>13.0</version>
+	</dependency>
 
     <!-- Test dependencies -->
 
@@ -276,6 +302,23 @@
       <version>${gremlin.version}</version>
       <scope>test</scope>
     </dependency>
+
+<!-- TODO: UNCOMMENT WHEN ADDING GREMLIN SERVER TESTS  
+    <dependency>
+      <groupId>org.apache.tinkerpop</groupId>
+      <artifactId>gremlin-server</artifactId>
+      <version>${gremlin.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.tinkerpop</groupId>
+      <artifactId>gremlin-driver</artifactId>
+      <version>${gremlin.version}</version>
+      <scope>test</scope>
+    </dependency>
+ -->
+ 
   </dependencies>
 
   <profiles>
@@ -285,21 +328,6 @@
     <profile>
       <id>bitsy-release</id>
       <build>
-        <!--
-        Configure deployment plugins in DM
-        -->
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-deploy-plugin</artifactId>
-              <configuration>
-                <updateReleaseInfo>true</updateReleaseInfo>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -388,6 +416,37 @@
                 <goals>
                   <goal>integration-test</goal>
                   <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!--
+    Enable running of coverage reports.
+    -->
+    <profile>
+      <id>coverage</id>
+      <activation>
+        <property>
+          <name>coverage</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>prepare-agent</goal>
+                  <goal>prepare-agent-integration</goal>
+                  <goal>report</goal>
+                  <goal>report-integration</goal>
                 </goals>
               </execution>
             </executions>
