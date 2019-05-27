@@ -1,18 +1,17 @@
 package com.lambdazen.bitsy.store;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.lambdazen.bitsy.BitsyException;
 import com.lambdazen.bitsy.BitsyState;
 import com.lambdazen.bitsy.UUID;
 import com.lambdazen.bitsy.ads.dict.DictionaryFactory;
 import com.lambdazen.bitsy.store.Record.RecordType;
-
 import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 public class RecordTest extends TestCase {
     public RecordTest() {
@@ -76,5 +75,19 @@ public class RecordTest extends TestCase {
         assertEquals(edgeBean.getProperties(), edgeBean2.getProperties());
         assertEquals(edgeBean.getProperties(), edgeBean2.getProperties());
         assertEquals(BitsyState.M, edgeBean2.getState());
+    }
+
+
+
+    public void testDictionaryMaxProperties() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectReader reader = mapper.reader(VertexBeanJson.class);
+
+        String json = "{\"id\":\"40026fee-498a-4cd9-afad-1ae31363c13e\",\"v\":1,\"s\":\"M\",\"p\":{\"a00\":\"00\",\"a01\":\"01\",\"a02\":\"02\",\"a03\":\"03\",\"a04\":\"04\",\"a05\":\"05\",\"a06\":\"06\",\"a07\":\"07\",\"a08\":\"08\",\"a09\":\"09\",\"a10\":\"10\",\"a11\":\"11\",\"a12\":\"12\",\"a13\":\"13\",\"a14\":\"14\",\"a15\":\"15\",\"a16\":\"16\",\"a17\":\"17\",\"a18\":\"18\",\"a19\":\"19\",\"a20\":\"20\",\"a21\":\"21\",\"a22\":\"22\",\"a23\":\"23\",\"a24\":\"24\",\"a25\":\"25\",\"a26\":\"26\",\"a27\":\"27\",\"a28\":\"28\",\"a29\":\"29\",\"a30\":\"30\",\"a31\":\"31\",\"a32\":\"32\",\"a33\":\"33\",\"a34\":\"34\",\"a35\":\"35\",\"a36\":\"36\",\"a37\":\"37\",\"a38\":\"38\",\"a39\":\"39\",\"a40\":\"40\",\"a41\":\"41\",\"a42\":\"42\",\"a43\":\"43\",\"a44\":\"44\",\"a45\":\"45\",\"a46\":\"46\",\"a47\":\"47\",\"a48\":\"48\",\"a49\":\"49\",\"a50\":\"50\"}}";
+
+        VertexBeanJson vBean = reader.readValue(json);
+
+        int count = vBean.getProperties().size();
+        assertEquals(51, count);
     }
 }
