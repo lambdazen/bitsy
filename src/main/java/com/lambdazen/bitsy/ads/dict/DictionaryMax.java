@@ -26,7 +26,7 @@ public class DictionaryMax extends PrimitiveDictionary implements Dictionary {
 
     // FromMap constructor
     public DictionaryMax(String[] keys, Object[] values) {
-        this.capacity = Math.min(24, keys.length + keys.length / 2);
+        this.capacity = Math.max(24, keys.length + keys.length / 2);
 
         this.keys = Arrays.copyOf(keys, capacity);
         this.values = Arrays.copyOf(values, capacity);

@@ -11,7 +11,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.1.1-SNAPSHOT</version>
+  <version>3.2.0</version>
 
   <name>Bitsy Graph Database</name>
   <description>
@@ -40,7 +40,7 @@
 
     <!-- versions -->
     <gremlin.version>3.3.4</gremlin.version>
-    <jackson.version>2.9.7</jackson.version>
+    <jackson.version>2.9.9</jackson.version>
 
     <!-- JaCoCo: empty -->
     <jacocoAgentArg></jacocoAgentArg>
