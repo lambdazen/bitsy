@@ -42,6 +42,8 @@ import com.lambdazen.bitsy.wrapper.BitsyAutoReloadingGraph;
 public class BitsyGraph implements Graph, BitsyGraphMBean {
     private static final Logger log = LoggerFactory.getLogger(BitsyGraph.class);
 
+    public static boolean IS_ANDROID = "The Android Project".equals(System.getProperty("java.specification.vendor"));
+
     // Configuration keys
     public static final String DB_PATH_KEY = "dbPath";
     public static final String ALLOW_FULL_GRAPH_SCANS_KEY = "allowFullGraphScans";
@@ -117,36 +119,45 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
         this.defaultIsolationLevel = BitsyIsolationLevel.READ_COMMITTED;
         this.createDirIfMissing = createDirIfMissing; 
 
-        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        if (isPersistent()) {
-            // Make sure that another BitsyGraph doesn't exist with the same path
-            try {
-                this.objectName = new ObjectName("com.lambdazen.bitsy", "path", ObjectName.quote(dbPath.toString()));
-            } catch (MalformedObjectNameException e) {
-                throw new BitsyException(BitsyErrorCodes.INTERNAL_ERROR, "Bug in quoting ObjectName", e);
-            }
-            
-            // Check registry
-            if (server.isRegistered(objectName)) {
-                throw new BitsyException(BitsyErrorCodes.INSTANCE_ALREADY_EXISTS, "Path " + dbPath.toString());
-            }
-            
-            // Load from files
-            this.graphStore = new FileBackedMemoryGraphStore(new MemoryGraphStore(allowFullGraphScans), dbPath, txLogThreshold, reorgFactor, createDirIfMissing);
+        if (IS_ANDROID) {
+        	if (isPersistent()) {
+	            // Load from files
+	            this.graphStore = new FileBackedMemoryGraphStore(new MemoryGraphStore(allowFullGraphScans), dbPath, txLogThreshold, reorgFactor, createDirIfMissing);
+	        } else {
+	            this.graphStore = new MemoryGraphStore(allowFullGraphScans);
+	        }
         } else {
-            this.graphStore = new MemoryGraphStore(allowFullGraphScans);
+	        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+	        if (isPersistent()) {
+	            // Make sure that another BitsyGraph doesn't exist with the same path
+	            try {
+	                this.objectName = new ObjectName("com.lambdazen.bitsy", "path", ObjectName.quote(dbPath.toString()));
+	            } catch (MalformedObjectNameException e) {
+	                throw new BitsyException(BitsyErrorCodes.INTERNAL_ERROR, "Bug in quoting ObjectName", e);
+	            }
+	            
+	            // Check registry
+	            if (server.isRegistered(objectName)) {
+	                throw new BitsyException(BitsyErrorCodes.INSTANCE_ALREADY_EXISTS, "Path " + dbPath.toString());
+	            }
+	            
+	            // Load from files
+	            this.graphStore = new FileBackedMemoryGraphStore(new MemoryGraphStore(allowFullGraphScans), dbPath, txLogThreshold, reorgFactor, createDirIfMissing);
+	        } else {
+	            this.graphStore = new MemoryGraphStore(allowFullGraphScans);
+	        }
+
+	        // Register this to the MBeanServer
+	        if (objectName != null) { 
+	            try {
+	                server.registerMBean(this, objectName);
+	            } catch (Exception e) {
+	                throw new BitsyException(BitsyErrorCodes.ERROR_REGISTERING_TO_MBEAN_SERVER, "Encountered exception", e);
+	            }
+	        }
         }
         
         this.bitsyFeatures = new BitsyFeatures(isPersistent);
-
-        // Register this to the MBeanServer
-        if (objectName != null) { 
-            try {
-                server.registerMBean(this, objectName);
-            } catch (Exception e) {
-                throw new BitsyException(BitsyErrorCodes.ERROR_REGISTERING_TO_MBEAN_SERVER, "Encountered exception", e);
-            }
-        }
     }
 
     /** 
