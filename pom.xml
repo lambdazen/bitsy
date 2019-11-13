@@ -40,7 +40,7 @@
 
     <!-- versions -->
     <gremlin.version>3.3.4</gremlin.version>
-    <jackson.version>2.9.9</jackson.version>
+    <jackson.version>2.10.1</jackson.version>
 
     <!-- JaCoCo: empty -->
     <jacocoAgentArg></jacocoAgentArg>
