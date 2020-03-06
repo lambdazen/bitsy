@@ -42,6 +42,18 @@ public class Record {
     BitsyEdge edge;
     BitsyVertex vertex;
 
+    public static boolean IS_ANDROID = "The Android Project".equals(System.getProperty("java.specification.vendor"));
+    public static int ANDROID_EOR = 1234567890;
+
+    public static int hashCode(String str) {
+        if (!IS_ANDROID) {
+                // Backward compatible for non-Android systems
+                return str.hashCode();
+        } else {
+            return ANDROID_EOR;
+        }
+    }
+
     public Record(RecordType type, String json) {
         this.type = type;
         this.json = json;
@@ -78,7 +90,7 @@ public class Record {
 
         sw.append('#');
 
-        int hashCode = sw.toString().hashCode();
+        int hashCode = hashCode(sw.toString());
         sw.append(toHex(hashCode));
         sw.append('\n');
     }
@@ -94,14 +106,14 @@ public class Record {
 
         sw.append('#');
 
-        int hashCode = sw.toString().hashCode();
+        int hashCode = hashCode(sw.toString());
         sw.append(toHex(hashCode));
         sw.append('\n');
     }
 
     public static String generateDBLine(RecordType type, String line) {
         String dbLine = type + "=" + line + "#";
-        int hashCode = dbLine.hashCode();
+        int hashCode = hashCode(dbLine);
 
         return dbLine + toHex(hashCode) + newLine;
     }
@@ -112,10 +124,10 @@ public class Record {
             throw new BitsyException(BitsyErrorCodes.CHECKSUM_MISMATCH, "Line " + lineNo + " in file " + fileName + " has no hash-code. Encountered " + dbLine);
         } else {
             String hashCode = dbLine.substring(hashPos + 1);
-            String expHashCode = toHex(dbLine.substring(0, hashPos + 1).hashCode());
+            String expHashCode = toHex(hashCode(dbLine.substring(0, hashPos + 1)));
 
-            if ((hashCode == null) || !hashCode.trim().equals(expHashCode)) {
-                throw new BitsyException(BitsyErrorCodes.CHECKSUM_MISMATCH, "Line " + lineNo + " in file " + fileName + " has the wrong hash-code '" + hashCode + "'. Expected '" + expHashCode + "'");
+            if ((hashCode == null) || !hashCode.trim().equals(expHashCode)) { // TODO: Currently DB is not portable between Android and Java
+                throw new BitsyException(BitsyErrorCodes.CHECKSUM_MISMATCH, "Line " + lineNo + " in file " + fileName + " has the wrong hash-code " + hashCode + ". Expected " + expHashCode);
             } else {
                 // All OK
                 RecordType type = typeFromChar(dbLine.charAt(0));
