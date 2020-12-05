@@ -10,7 +10,6 @@ import com.lambdazen.bitsy.BitsyState;
 import com.lambdazen.bitsy.UUID;
 import com.lambdazen.bitsy.ads.dict.Dictionary;
 import com.lambdazen.bitsy.ads.dict.DictionaryFactory;
-import com.nesscomputing.uuid.NessUUID;
 
 @JsonPropertyOrder({"id", "v", "s", "p"})
 public final class VertexBeanJson extends VertexBean implements Serializable {

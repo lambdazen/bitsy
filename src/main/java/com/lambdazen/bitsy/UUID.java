@@ -1,7 +1,6 @@
 package com.lambdazen.bitsy;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.nesscomputing.uuid.NessUUID;
 
 /** This class captures a UUID and is modeled after java.util.UUID */
 public class UUID implements Comparable<UUID> {
@@ -33,11 +32,11 @@ public class UUID implements Comparable<UUID> {
     }
     
     public String uuidRepr() {
-        return NessUUID.toString(mostSigBits, leastSigBits);
+        return new java.util.UUID(mostSigBits, leastSigBits).toString();
     }
     
     public static UUID fromString(String str) {
-        java.util.UUID ans = NessUUID.fromString(str);
+        java.util.UUID ans = java.util.UUID.fromString(str);
         
         return new UUID(ans.getMostSignificantBits(), ans.getLeastSignificantBits());
     }
@@ -87,6 +86,6 @@ public class UUID implements Comparable<UUID> {
     }
 
     public static String toString(UUID obj) {
-        return NessUUID.toString(obj.getMostSignificantBits(), obj.getLeastSignificantBits());
+        return new java.util.UUID(obj.getMostSignificantBits(), obj.getLeastSignificantBits()).toString();
     }
 }
