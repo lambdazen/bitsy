@@ -572,8 +572,14 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
             graphStore.shutdown();
 
             // remove threadlocal to avoid OOM
-            curTransaction.remove();
-            curTransactionContext.remove()
+            if (curTransaction != null) {
+                try {
+                    curTransaction.remove();
+                    curTransactionContext.remove();
+                } catch (Throwable t) {
+                    // Ignore
+                }
+            }
         } finally {
             if (this.objectName != null) {
                 // Deregister from JMX
