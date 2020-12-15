@@ -11,7 +11,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.3.1</version>
+  <version>3.4.0</version>
 
   <name>Bitsy Graph Database</name>
   <description>
@@ -279,7 +279,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
 
