@@ -39,7 +39,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- versions -->
-    <gremlin.version>3.4.6</gremlin.version>
+    <gremlin.version>3.4.9</gremlin.version>
     <jackson.version>2.10.3</jackson.version>
 
     <!-- JaCoCo: empty -->
