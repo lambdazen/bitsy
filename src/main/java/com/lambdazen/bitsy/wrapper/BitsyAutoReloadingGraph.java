@@ -2,7 +2,7 @@ package com.lambdazen.bitsy.wrapper;
 
 import java.util.Iterator;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -19,7 +19,7 @@ public class BitsyAutoReloadingGraph implements Graph {
     public BitsyAutoReloadingGraph(BitsyGraph g) {
         this.graph = g;
     }
-    
+
     public BitsyGraph getBaseGraph() {
         return graph;
     }
@@ -29,58 +29,58 @@ public class BitsyAutoReloadingGraph implements Graph {
     }
 
     public static final BitsyAutoReloadingGraph open(Configuration configuration) {
-    	return new BitsyAutoReloadingGraph(BitsyGraph.open(configuration));
+        return new BitsyAutoReloadingGraph(BitsyGraph.open(configuration));
     }
 
     @Override
-	public Vertex addVertex(Object... keyValues) {
+        public Vertex addVertex(Object... keyValues) {
         BitsyVertex base = (BitsyVertex)(graph.addVertex(keyValues));
-        
+
         return new BitsyAutoReloadingVertex(graph, base);
-	}
+        }
 
-	@Override
-	public <C extends GraphComputer> C compute(Class<C> graphComputerClass) throws IllegalArgumentException {
-		return (C)graph.compute(graphComputerClass);
-	}
+        @Override
+        public <C extends GraphComputer> C compute(Class<C> graphComputerClass) throws IllegalArgumentException {
+                return (C)graph.compute(graphComputerClass);
+        }
 
-	@Override
-	public GraphComputer compute() throws IllegalArgumentException {
-		return graph.compute();
-	}
+        @Override
+        public GraphComputer compute() throws IllegalArgumentException {
+                return graph.compute();
+        }
 
-	@Override
-	public Iterator<Vertex> vertices(Object... vertexIds) {
-		Iterator<Vertex> result = graph.vertices(vertexIds);
-		return new VertexIterator(graph, result);
-	}
+        @Override
+        public Iterator<Vertex> vertices(Object... vertexIds) {
+                Iterator<Vertex> result = graph.vertices(vertexIds);
+                return new VertexIterator(graph, result);
+        }
 
-	@Override
-	public Iterator<Edge> edges(Object... edgeIds) {
-		Iterator<Edge> result = graph.edges(edgeIds);
+        @Override
+        public Iterator<Edge> edges(Object... edgeIds) {
+                Iterator<Edge> result = graph.edges(edgeIds);
 
-		return new EdgeIterator(graph, result);
-	}
+                return new EdgeIterator(graph, result);
+        }
 
-	@Override
-	public Transaction tx() {
-		return graph.tx();
-	}
+        @Override
+        public Transaction tx() {
+                return graph.tx();
+        }
 
-	@Override
-	public void close() throws Exception {
-		graph.close();		
-	}
+        @Override
+        public void close() throws Exception {
+                graph.close();
+        }
 
-	@Override
-	public Variables variables() {
-		return graph.variables();
-	}
+        @Override
+        public Variables variables() {
+                return graph.variables();
+        }
 
-	@Override
-	public Configuration configuration() {
-		return graph.configuration();
-	}
+        @Override
+        public Configuration configuration() {
+                return graph.configuration();
+        }
 
     @Override
     public Graph.Features features() {
