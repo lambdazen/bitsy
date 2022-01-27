@@ -4,7 +4,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.4.2</version>
+  <version>3.5.1-SNAPSHOT</version>
 
   <name>Bitsy Graph Database</name>
   <description>
