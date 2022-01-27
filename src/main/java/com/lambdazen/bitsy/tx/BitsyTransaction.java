@@ -76,10 +76,10 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 //    	}
     }
 
-    @Override
-    public <T extends TraversalSource> T begin(final Class<T> traversalSourceClass) {
-        return graph.traversal(traversalSourceClass);
-    }
+    //@Override
+    //public <T extends TraversalSource> T begin(final Class<T> traversalSourceClass) {
+    //    return graph.traversal(traversalSourceClass);
+    //}
 
     @Override
     public void commit() {
