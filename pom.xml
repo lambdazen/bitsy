@@ -71,7 +71,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
       </plugin>
 
       <plugin>
@@ -86,7 +86,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.2.2</version>
       </plugin>
 
       <plugin>
@@ -175,6 +175,8 @@
           <doclint>none</doclint>
           <!-- Make it less fragile -->
           <detectLinks>false</detectLinks>
+          <!-- Source is 8 -->
+          <source>8</source>
         </configuration>
       </plugin>
 
@@ -213,7 +215,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.0</version>
+                  <version>3.6</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>[1.8,)</version>
