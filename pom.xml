@@ -2,13 +2,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>9</version>
-    <relativePath/>
-  </parent>
-
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
   <version>3.4.2</version>
@@ -39,8 +32,9 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- versions -->
-    <gremlin.version>3.4.9</gremlin.version>
-    <jackson.version>2.12.1</jackson.version>
+    <gremlin.version>3.4.13</gremlin.version>
+    <slf4j.version>1.7.35</slf4j.version>
+    <jackson.version>2.13.1</jackson.version>
 
     <!-- JaCoCo: empty -->
     <jacocoAgentArg></jacocoAgentArg>
@@ -52,6 +46,19 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </repository>
   </repositories>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>sonatype-nexus-snapshots</id>
+      <name>Sonatype Nexus Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>sonatype-nexus-staging</id>
+      <name>Nexus Release Repository</name>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
 
   <build>
     <plugins>
@@ -69,7 +76,7 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.9.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -79,18 +86,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
       </plugin>
 
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <forkMode>once</forkMode>
           <reuseForks>false</reuseForks>
           <forkCount>1</forkCount>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>@{jacocoAgentArg} -XX:-UseSplitVerifier</argLine>
+          <argLine>@{jacocoAgentArg} -noverify</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
@@ -100,20 +107,19 @@
           <includes>
             <include>**/*Test.java</include>
             <include>**/*TestCase.java</include>
-<!--            <include>**/*TestSuite.java</include> -->
           </includes>
         </configuration>
       </plugin>
 
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.22.1</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <forkMode>once</forkMode>
           <reuseForks>false</reuseForks>
           <forkCount>1</forkCount>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>@{jacocoAgentArg} -XX:-UseSplitVerifier</argLine>
+          <argLine>@{jacocoAgentArg} -noverify</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
@@ -137,19 +143,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.0.0-M1</version>
+        <version>3.0.0-M2</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
+        <version>3.0.1</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -163,17 +169,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.3.1</version>
         <configuration>
           <!-- Turn off strict javadoc checks in Java-8 -->
           <doclint>none</doclint>
+          <!-- Make it less fragile -->
+          <detectLinks>false</detectLinks>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>2.5.3</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <localCheckout>true</localCheckout>
           <pushChanges>false</pushChanges>
@@ -189,29 +197,37 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.10.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M2</version>
-        <configuration>
-          <rules>
-            <requireMavenVersion>
-              <version>[3.5.0,)</version>
-            </requireMavenVersion>
-            <requireJavaVersion>
-              <version>[1.8,)</version>
-            </requireJavaVersion>
-          </rules>
-        </configuration>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.0</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[1.8,)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.2</version>
+        <version>0.8.7</version>
         <configuration>
           <propertyName>jacocoAgentArg</propertyName>
         </configuration>
@@ -220,7 +236,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <executions> 
           <execution> 
             <phase>install</phase> 
@@ -264,29 +280,22 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.25</version>
+      <version>${slf4j.version}</version>
     </dependency>
-
-<!-- UNCOMMENT IF REQUIRE -->
-	<dependency>
-	    <groupId>com.google.guava</groupId>
-	    <artifactId>guava</artifactId>
-	    <version>13.0</version>
-	</dependency>
 
     <!-- Test dependencies -->
 
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.7.25</version>
+      <version>${slf4j.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -368,6 +377,19 @@
               <execution>
                 <goals>
                   <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
                 </goals>
               </execution>
             </executions>
