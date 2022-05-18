@@ -4,7 +4,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.5.1-SNAPSHOT</version>
+  <version>3.5.1</version>
 
   <name>Bitsy Graph Database</name>
   <description>
@@ -32,7 +32,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- versions -->
-    <gremlin.version>3.4.13</gremlin.version>
+    <gremlin.version>3.5.3</gremlin.version>
     <slf4j.version>1.7.35</slf4j.version>
     <jackson.version>2.13.1</jackson.version>
 
