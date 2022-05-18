@@ -1,6 +1,5 @@
 package com.lambdazen.bitsy;
 
-import org.apache.commons.lang3.SerializationException;
 import org.apache.tinkerpop.gremlin.structure.io.Buffer;
 import org.apache.tinkerpop.gremlin.structure.io.binary.DataType;
 import org.apache.tinkerpop.gremlin.structure.io.binary.GraphBinaryReader;
@@ -29,7 +28,7 @@ public class UUIDGraphBinarySerializer implements CustomTypeSerializer<UUID>
         // {custom type info}, {value_flag} and {value}
         // No custom_type_info
         if (buffer.readInt() != 0) {
-            throw new SerializationException("{custom_type_info} should not be provided for this custom type");
+            throw new IOException("{custom_type_info} should not be provided for this custom type");
         }
 
         return readValue(buffer, context, true);
@@ -48,11 +47,11 @@ public class UUIDGraphBinarySerializer implements CustomTypeSerializer<UUID>
         final int valueLength = buffer.readInt();
 
         if (valueLength <= 0) {
-            throw new SerializationException(String.format("Unexpected value length: %d", valueLength));
+            throw new IOException(String.format("Unexpected value length: %d", valueLength));
         }
 
         if (valueLength > buffer.readableBytes()) {
-            throw new SerializationException(
+            throw new IOException(
                     String.format("Not enough readable bytes: %d (expected %d)", valueLength, buffer.readableBytes()));
         }
 
@@ -73,7 +72,7 @@ public class UUIDGraphBinarySerializer implements CustomTypeSerializer<UUID>
     public void writeValue(UUID value, Buffer buffer, GraphBinaryWriter context, boolean nullable) throws IOException {
         if (value == null) {
             if (!nullable) {
-                throw new SerializationException("Unexpected null value when nullable is false");
+                throw new IOException("Unexpected null value when nullable is false");
             }
 
             context.writeValueFlagNull(buffer);
