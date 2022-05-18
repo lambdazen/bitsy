@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalSource;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
@@ -74,6 +75,11 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 //    		throw new IllegalStateException("Unrecognized readwrite consumer. Neither AUTO nor MANUAL");
 //    	}
     }
+
+    //@Override
+    //public <T extends TraversalSource> T begin(final Class<T> traversalSourceClass) {
+    //    return graph.traversal(traversalSourceClass);
+    //}
 
     @Override
     public void commit() {
