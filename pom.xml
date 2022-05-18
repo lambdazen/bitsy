@@ -34,7 +34,7 @@
     <!-- versions -->
     <gremlin.version>3.4.13</gremlin.version>
     <slf4j.version>1.7.35</slf4j.version>
-    <jackson.version>2.13.1</jackson.version>
+    <jackson.version>2.13.2.1</jackson.version>
 
     <!-- JaCoCo: empty -->
     <jacocoAgentArg></jacocoAgentArg>
