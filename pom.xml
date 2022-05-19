@@ -7,6 +7,20 @@
   <version>3.5.1</version>
 
   <name>Bitsy Graph Database</name>
+  <developers>
+    <developer>
+      <id>lambdazen</id>
+      <name>Sridhar Ramachandran</name>
+      <email>sridhar@lambdazen.com</email>
+      <url>https://lambdazen.com</url>
+    </developer>
+    <developer>
+      <id>cstamas</id>
+      <name>Tamas Cservenak</name>
+      <email>tamas@cservenak.net</email>
+      <url>https://www.cstamas.org</url>
+    </developer>
+  </developers>
   <description>
     Bitsy v3 is a small, fast, embeddable, durable in-memory graph database that is compatible with Tinkerpop3
   </description>
