@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 // Bitsy graph step based Tinkerpop's Neo4j implementation
@@ -52,19 +53,12 @@ public final class BitsyGraphStep<S, E extends Element> extends GraphStep<S, E> 
 
     private Iterator<Vertex> lookupVertices(final BitsyGraph graph, final List<HasContainer> hasContainers, final Object... ids) {
         // ids are present, filter on them first
-        if (ids.length > 0)
+        if (ids != null && ids.length > 0)
             return IteratorUtils.filter(graph.vertices(ids), vertex -> HasContainer.testAll(vertex, hasContainers));
-
-        // get a label being search on
-        Optional<String> label = hasContainers.stream()
-            .filter(hasContainer -> hasContainer.getKey().equals(T.label.getAccessor()))
-            .filter(hasContainer -> Compare.eq == hasContainer.getBiPredicate())
-            .map(hasContainer -> (String) hasContainer.getValue())
-            .findAny();
 
         // Labels aren't indexed in Bitsy, only keys -- so do a full scan
         for (final HasContainer hasContainer : hasContainers) {
-            if (Compare.eq == hasContainer.getBiPredicate() && !hasContainer.getKey().equals(T.label.getAccessor())) {
+            if (Compare.eq == hasContainer.getBiPredicate() && !Objects.equals(hasContainer.getKey(), T.label.getAccessor())) {
                 if (graph.getIndexedKeys(Vertex.class).contains(hasContainer.getKey())) {
                     // Find a vertex by key/value
                     return IteratorUtils.stream(graph.verticesByIndex(hasContainer.getKey(), hasContainer.getValue()))
@@ -83,19 +77,12 @@ public final class BitsyGraphStep<S, E extends Element> extends GraphStep<S, E> 
 
     private Iterator<Edge> lookupEdges(final BitsyGraph graph, final List<HasContainer> hasContainers, final Object... ids) {
         // ids are present, filter on them first
-        if (ids.length > 0)
+        if (ids != null && ids.length > 0)
             return IteratorUtils.filter(graph.edges(ids), vertex -> HasContainer.testAll(vertex, hasContainers));
-
-        // get a label being search on
-        Optional<String> label = hasContainers.stream()
-            .filter(hasContainer -> hasContainer.getKey().equals(T.label.getAccessor()))
-            .filter(hasContainer -> Compare.eq == hasContainer.getBiPredicate())
-            .map(hasContainer -> (String) hasContainer.getValue())
-            .findAny();
 
         // Labels aren't indexed in Bitsy, only keys -- so do a full scan
         for (final HasContainer hasContainer : hasContainers) {
-            if (Compare.eq == hasContainer.getBiPredicate() && !hasContainer.getKey().equals(T.label.getAccessor())) {
+            if (Compare.eq == hasContainer.getBiPredicate() && !Objects.equals(hasContainer.getKey(), T.label.getAccessor())) {
                 if (graph.getIndexedKeys(Vertex.class).contains(hasContainer.getKey())) {
                     // Find a vertex by key/value
                     return IteratorUtils.stream(graph.edgesByIndex(hasContainer.getKey(), hasContainer.getValue()))

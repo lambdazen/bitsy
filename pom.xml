@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.6.2</version>
+  <version>3.6.3-SNAPSHOT</version>
 
   <name>Bitsy Graph Database</name>
   <developers>
@@ -44,14 +43,15 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.release>8</maven.compiler.release>
 
     <!-- versions -->
-    <gremlin.version>3.6.2</gremlin.version>
-    <slf4j.version>1.7.35</slf4j.version>
-    <jackson.version>2.13.1</jackson.version>
+    <gremlin.version>3.6.8</gremlin.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <jackson.version>2.19.0</jackson.version>
 
     <!-- JaCoCo: empty -->
-    <jacocoAgentArg></jacocoAgentArg>
+    <jacocoAgentArg />
   </properties>
 
   <repositories>
@@ -79,39 +79,39 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.4.1</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.1</version>
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.9.0</version>
+        <version>3.14.0</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.4.2</version>
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
+        <version>3.5.3</version>
         <configuration>
-          <forkMode>once</forkMode>
           <reuseForks>false</reuseForks>
           <forkCount>1</forkCount>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>@{jacocoAgentArg} -noverify</argLine>
+          <argLine>@{jacocoAgentArg} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
@@ -126,14 +126,14 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M5</version>
+        <version>3.5.3</version>
         <configuration>
-          <forkMode>once</forkMode>
           <reuseForks>false</reuseForks>
           <forkCount>1</forkCount>
           <failIfNoTests>false</failIfNoTests>
-          <argLine>@{jacocoAgentArg} -noverify</argLine>
+          <argLine>@{jacocoAgentArg} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
           <systemPropertyVariables>
@@ -151,25 +151,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
-        <version>3.0.0-M1</version>
+        <version>3.1.4</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.1.4</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.2.7</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -183,7 +183,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>3.11.2</version>
         <configuration>
           <!-- Turn off strict javadoc checks in Java-8 -->
           <doclint>none</doclint>
@@ -197,7 +197,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>3.0.0-M5</version>
+        <version>3.1.1</version>
         <configuration>
           <localCheckout>true</localCheckout>
           <pushChanges>false</pushChanges>
@@ -213,13 +213,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.10.0</version>
+        <version>3.21.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <id>enforce</id>
@@ -229,10 +229,10 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.6</version>
+                  <version>[3.9,)</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>[1.8,)</version>
+                  <version>[21,)</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -243,7 +243,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.7</version>
+        <version>0.8.13</version>
         <configuration>
           <propertyName>jacocoAgentArg</propertyName>
         </configuration>
@@ -252,7 +252,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.8.1</version>
         <executions> 
           <execution> 
             <phase>install</phase> 
@@ -386,7 +386,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
             <configuration>
-              <passphrase>${gpg.passphrase}</passphrase>
               <useAgent>true</useAgent>
             </configuration>
             <executions>

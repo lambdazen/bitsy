@@ -177,32 +177,33 @@ public class Record {
         JsonToken token;
 
         try {
-            JsonParser parser = factory.createJsonParser(json);
+            try (JsonParser parser = factory.createParser(json)) {
+                while ((token = parser.nextToken()) != JsonToken.END_OBJECT) {
+                    // Find the version
+                    if (token == JsonToken.FIELD_NAME) {
+                        if (parser.currentName().equals("id")) {
+                            parser.nextToken();
+                            id = UUID.fromString(parser.getText());
+                            continue;
+                        }
 
-            while ((token = parser.nextToken()) != JsonToken.END_OBJECT) {
-                // Find the version
-                if (token == JsonToken.FIELD_NAME) {
-                    if (parser.getCurrentName().equals("id")) {
-                        parser.nextToken();
-                        id = UUID.fromString(parser.getText());
-                        continue;
-                    }
+                        if (parser.currentName().equals("v")) {
+                            parser.nextToken();
+                            version = parser.getIntValue();
+                            continue;
+                        }
 
-                    if (parser.getCurrentName().equals("v")) {
-                        parser.nextToken();
-                        version = parser.getIntValue();
-                        continue;
-                    }
+                        if (parser.currentName().equals("s")) {
+                            parser.nextToken();
+                            state = parser.getText();
 
-                    if (parser.getCurrentName().equals("s")) {
-                        parser.nextToken();
-                        state = parser.getText();
-
-                        // No need to proceed further
-                        break;
+                            // No need to proceed further
+                            break;
+                        }
                     }
                 }
             }
+
 
             if ((id == null) || (version == -1) || (state == null)) {
                 throw new BitsyException(BitsyErrorCodes.INTERNAL_ERROR, "Unable to parse record '" + json + "' in file " + fileName + " at line " + lineNo);

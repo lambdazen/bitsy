@@ -16,7 +16,8 @@ A note on branch names:
 
 ## Building it
 
-Use latest [Apache Maven](https://maven.apache.org/) to build this project. Requires at least version 3.5.0.
+The project **build time requirement** is [Apache Maven](https://maven.apache.org/), at least version 3.9 and Java 21.
+The project **run time requirement is Java 8**.
 
 For quick build (runs no tests nor any other plugin like javadoc)
 
