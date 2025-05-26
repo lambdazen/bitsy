@@ -13,11 +13,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Element;
@@ -112,14 +115,15 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         this.memStore = memStore;
         this.dbPath = dbPath;
         log.info("Starting graph " + toString());
-       
-        this.mapper = new ObjectMapper();
+
+        JsonMapper.Builder builder = JsonMapper.builder();
         // Indentation must be turned off
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, false);
-        mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-        mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        builder.configure(SerializationFeature.INDENT_OUTPUT, false);
+        builder.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        mapper = builder.build();
+        mapper.configOverride(Map.class).setInclude(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
         mapper.setSerializationInclusion(Include.NON_NULL);
-        mapper.enableDefaultTyping();
+        mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator());
         
         if (!dbPath.toFile().isDirectory()) {
         	if (!createDirIfMissing) {

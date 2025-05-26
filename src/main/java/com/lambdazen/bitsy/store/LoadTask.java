@@ -37,8 +37,8 @@ public class LoadTask implements Runnable {
         this.totalVE = 0;
         this.opsPerNonTxCommit = opsPerNonTxCommit;
         this.mapper = mapper;
-        this.vReader = mapper.reader(VertexBeanJson.class);
-        this.eReader = mapper.reader(EdgeBeanJson.class);
+        this.vReader = mapper.readerFor(VertexBeanJson.class);
+        this.eReader = mapper.readerFor(EdgeBeanJson.class);
         this.repairMode = safeMode;
     }
     
