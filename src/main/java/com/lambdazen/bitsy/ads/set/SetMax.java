@@ -2,7 +2,7 @@ package com.lambdazen.bitsy.ads.set;
 
 public class SetMax<T> implements Set<T> {
     private static final long serialVersionUID = 129583038274146507L;
-    
+
     private static final ClassifierGetter identityClassifer = new ClassifierGetter() {
         @Override
         public Object getClassifier(Object obj) {
@@ -17,14 +17,14 @@ public class SetMax<T> implements Set<T> {
         // When using a compact multi-set inside a set, it is better to use
         // safe-mode to avoid a cyclic dependency when all hash-codes are same
         hashSet = new CompactMultiSetMax<T, T>(32, true);
-        
+
         Object[] elems = oldSet.getElements();
-        for (int i=0; i < elems.length; i++) {
-            T curElem = (T)elems[i];
+        for (int i = 0; i < elems.length; i++) {
+            T curElem = (T) elems[i];
             hashSet.addElementNoRehash(curElem.hashCode(), curElem);
         }
 
-        T curElem = (T)elem;
+        T curElem = (T) elem;
         hashSet.addElementNoRehash(curElem.hashCode(), curElem);
 
         this.size = 1 + elems.length;

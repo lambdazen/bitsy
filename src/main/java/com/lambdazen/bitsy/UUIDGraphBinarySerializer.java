@@ -1,17 +1,15 @@
 package com.lambdazen.bitsy;
 
+import java.io.IOException;
 import org.apache.tinkerpop.gremlin.structure.io.Buffer;
 import org.apache.tinkerpop.gremlin.structure.io.binary.DataType;
 import org.apache.tinkerpop.gremlin.structure.io.binary.GraphBinaryReader;
 import org.apache.tinkerpop.gremlin.structure.io.binary.GraphBinaryWriter;
 import org.apache.tinkerpop.gremlin.structure.io.binary.types.CustomTypeSerializer;
 
-import java.io.IOException;
+public class UUIDGraphBinarySerializer implements CustomTypeSerializer<UUID> {
 
-public class UUIDGraphBinarySerializer implements CustomTypeSerializer<UUID>
-{
-
-    private final byte[] typeInfoBuffer = new byte[] { 0, 0, 0, 0 };
+    private final byte[] typeInfoBuffer = new byte[] {0, 0, 0, 0};
 
     @Override
     public String getTypeName() {
@@ -92,5 +90,4 @@ public class UUIDGraphBinarySerializer implements CustomTypeSerializer<UUID>
         context.writeValue(msb, buffer, false);
         context.writeValue(lsb, buffer, false);
     }
-
 }

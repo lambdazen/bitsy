@@ -18,9 +18,9 @@ public class DictionaryFactory {
             values[counter] = entry.getValue();
             counter++;
         }
-        
-        //assert counter == size;
-        
+
+        // assert counter == size;
+
         if (size == 0) {
             return null;
         } else if (size <= 1) {

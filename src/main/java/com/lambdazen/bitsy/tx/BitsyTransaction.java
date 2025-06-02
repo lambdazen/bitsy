@@ -1,20 +1,5 @@
 package com.lambdazen.bitsy.tx;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.apache.tinkerpop.gremlin.process.traversal.TraversalSource;
-import org.apache.tinkerpop.gremlin.structure.Direction;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Graph;
-import org.apache.tinkerpop.gremlin.structure.Transaction;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.apache.tinkerpop.gremlin.process.traversal.TraversalSource;
-
 import com.lambdazen.bitsy.BitsyEdge;
 import com.lambdazen.bitsy.BitsyElement;
 import com.lambdazen.bitsy.BitsyErrorCodes;
@@ -31,6 +16,17 @@ import com.lambdazen.bitsy.store.EdgeBean;
 import com.lambdazen.bitsy.store.VertexBean;
 import com.lambdazen.bitsy.util.EdgeIterator;
 import com.lambdazen.bitsy.util.VertexIterator;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Consumer;
+import org.apache.tinkerpop.gremlin.process.traversal.TraversalSource;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Transaction;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 /** This class captures a transaction that is NOT thread-safe */
 public class BitsyTransaction implements ITransaction, ICommitChanges {
@@ -71,10 +67,10 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         }
     }
 
-    //@Override
-    //public <T extends TraversalSource> T begin(final Class<T> traversalSourceClass) {
+    // @Override
+    // public <T extends TraversalSource> T begin(final Class<T> traversalSourceClass) {
     //    return graph.traversal(traversalSourceClass);
-    //}
+    // }
 
     @Override
     public void commit() {
@@ -152,7 +148,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         }
 
         if (bitsyElement instanceof BitsyEdge) {
-            BitsyEdge edge = (BitsyEdge)bitsyElement;
+            BitsyEdge edge = (BitsyEdge) bitsyElement;
             return (isDeletedVertex(edge.getInVertexId()) || isDeletedVertex(edge.getOutVertexId()));
         } else {
             return false;
@@ -183,7 +179,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         if (ans != null) {
             // 3. Keep a reference if the isolation level is repeatable read
             if (isolationLevel == BitsyIsolationLevel.REPEATABLE_READ) {
-                context.unmodifiedVertices.put((UUID)(ans.id()), ans);
+                context.unmodifiedVertices.put((UUID) (ans.id()), ans);
             }
         }
 
@@ -223,7 +219,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 
         // 4. Keep a reference when the isolation level is repeatable read
         if (isolationLevel == BitsyIsolationLevel.REPEATABLE_READ) {
-            context.unmodifiedEdges.put((UUID)(ans.id()), ans);
+            context.unmodifiedEdges.put((UUID) (ans.id()), ans);
         }
 
         return ans;
@@ -244,8 +240,8 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 
         for (Direction myDir : directions) {
             if ((myDir == dir) || (dir == Direction.BOTH)) {
-                //log.debug("Getting edges for dir {} and labels {}", myDir, Arrays.asList(edgeLabels));
-                List<UUID> txEdgeIds = context.adjMap.getEdges((UUID)bitsyVertex.id(), myDir, edgeLabels);
+                // log.debug("Getting edges for dir {} and labels {}", myDir, Arrays.asList(edgeLabels));
+                List<UUID> txEdgeIds = context.adjMap.getEdges((UUID) bitsyVertex.id(), myDir, edgeLabels);
                 // Go over each edge in storeEdges and merge it with the changedEdges to get mergedEdges
                 for (UUID edgeId : txEdgeIds) {
                     Edge edge = getEdge(edgeId);
@@ -253,20 +249,20 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
                     // An end-point vertex may be deleted in this Tx, so this check is required
                     if (edge != null) {
                         mergedEdges.add(edge);
-                        //log.debug("Merged edges.1 += {}", edge);
+                        // log.debug("Merged edges.1 += {}", edge);
                     }
                 }
 
                 // Get the edges from the store
                 // TODO: See if this can be made into a lazy data-structure
-                List<EdgeBean> storeEdges = context.store.getEdges((UUID)bitsyVertex.id(), myDir, edgeLabels);
+                List<EdgeBean> storeEdges = context.store.getEdges((UUID) bitsyVertex.id(), myDir, edgeLabels);
 
                 // Go over each edge in storeEdges and merge it with the changedEdges to get mergedEdges
                 for (EdgeBean edge : storeEdges) {
                     // Check if the edge has been changed
-                    BitsyEdge changedEdge = context.changedEdges.get((UUID)edge.getId());
+                    BitsyEdge changedEdge = context.changedEdges.get((UUID) edge.getId());
                     if (changedEdge == null) {
-                        changedEdge = context.unmodifiedEdges.get((UUID)edge.getId());
+                        changedEdge = context.unmodifiedEdges.get((UUID) edge.getId());
                     }
 
                     if (changedEdge != null) {
@@ -279,7 +275,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
                                 // Keep this edge, but give the version from this transaction
                                 mergedEdges.add(changedEdge);
 
-                                //log.debug("Merged edges.2 += {}", changedEdge);
+                                // log.debug("Merged edges.2 += {}", changedEdge);
                             }
                         }
                     } else {
@@ -293,7 +289,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
                             // Keep this edge as provided by the graph store (i.e., outside tx context)
                             mergedEdges.add(changedEdge);
 
-                            //log.debug("Merged edges.3 += {}", changedEdge);
+                            // log.debug("Merged edges.3 += {}", changedEdge);
 
                             // Add it to the Tx context
                             context.unmodifiedEdges.put(edge.getId(), changedEdge);
@@ -314,14 +310,14 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         bitsyElement.setState(BitsyState.M);
 
         // ...and must be added to the changedVertices if missing
-        UUID id = (UUID)bitsyElement.id();
+        UUID id = (UUID) bitsyElement.id();
         if (bitsyElement instanceof BitsyVertex) {
             context.unmodifiedVertices.remove(id);
-            context.changedVertices.put(id, (BitsyVertex)bitsyElement);
+            context.changedVertices.put(id, (BitsyVertex) bitsyElement);
         } else {
             context.unmodifiedEdges.remove(id);
 
-            BitsyEdge edge = (BitsyEdge)bitsyElement;
+            BitsyEdge edge = (BitsyEdge) bitsyElement;
             context.changedEdges.put(id, edge);
         }
     }
@@ -331,7 +327,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         checkIfActive();
 
         // If so, the vertex must be added to changedVertices
-        UUID id = (UUID)vertex.id();
+        UUID id = (UUID) vertex.id();
         context.changedVertices.put(id, vertex);
     }
 
@@ -341,14 +337,16 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 
         // Ensure that the edge was created in this transaction
         if (vertex.getTransaction() != this) {
-            throw new BitsyException(BitsyErrorCodes.REMOVING_VERTEX_FROM_ANOTHER_TX, "Vertex " + vertex.id() + " belongs to a different transaction");
+            throw new BitsyException(
+                    BitsyErrorCodes.REMOVING_VERTEX_FROM_ANOTHER_TX,
+                    "Vertex " + vertex.id() + " belongs to a different transaction");
         }
 
         // The element must be marked as deleted
         vertex.setState(BitsyState.D);
 
         // Add to changed vertices, if not already available
-        UUID id = (UUID)vertex.id();
+        UUID id = (UUID) vertex.id();
         context.changedVertices.put(id, vertex);
         context.unmodifiedVertices.remove(id);
 
@@ -369,14 +367,12 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
             throw new BitsyException(BitsyErrorCodes.ADDING_EDGE_FROM_A_DELETED_VERTEX);
         }
 
-        UUID id = (UUID)edge.id();
+        UUID id = (UUID) edge.id();
         context.changedEdges.put(id, edge);
 
         // and the adjacency map
         context.adjMap.addEdge(id, edge.getOutVertexId(), edge.label(), edge.getInVertexId(), edge.getVersion());
     }
-
-
 
     public void removeEdge(BitsyEdge edge) throws BitsyException {
         // Only work on live transactions. It is OK if the vertex is already modified/deleted.
@@ -384,19 +380,21 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 
         // Ensure that the edge was created in this transaction
         if (edge.getTransaction() != this) {
-            throw new BitsyException(BitsyErrorCodes.REMOVING_EDGE_FROM_ANOTHER_TX, "Edge " + edge.id() + " belongs to a different transaction");
+            throw new BitsyException(
+                    BitsyErrorCodes.REMOVING_EDGE_FROM_ANOTHER_TX,
+                    "Edge " + edge.id() + " belongs to a different transaction");
         }
 
         // The element must be marked as deleted
         edge.setState(BitsyState.D);
 
         // Add to changed edges, if not already available
-        UUID id = (UUID)edge.id();
+        UUID id = (UUID) edge.id();
         context.changedEdges.put(id, edge);
         context.unmodifiedEdges.remove(id);
 
         // Remove from adjacency map
-        context.adjMap.removeEdge((UUID)edge.id(), edge.getOutVertexId(), edge.label(), edge.getInVertexId());
+        context.adjMap.removeEdge((UUID) edge.id(), edge.getOutVertexId(), edge.label(), edge.getInVertexId());
     }
 
     public Collection<BitsyVertex> getVertexChanges() {
@@ -418,7 +416,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         // 2. Wrap it around an iterator for this transaction. Idea is for the
         // transaction to take priority over vertices in the store. Creating a
         // copy to avoid concurrent modification exceptions
-        return (Iterator)new VertexIterator(this, new ArrayList<BitsyVertex>(getVertexChanges()), allVertices);
+        return (Iterator) new VertexIterator(this, new ArrayList<BitsyVertex>(getVertexChanges()), allVertices);
     }
 
     @Override
@@ -432,7 +430,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
         // 2. Wrap it around an iterator for this transaction. Idea is for the
         // transaction to take priority over vertices in the store. Creating a
         // copy to avoid concurrent modification exceptions
-        return (Iterator)new EdgeIterator(this, new ArrayList<BitsyEdge>(getEdgeChanges()), allEdges);
+        return (Iterator) new EdgeIterator(this, new ArrayList<BitsyEdge>(getEdgeChanges()), allEdges);
     }
 
     @Override
@@ -538,7 +536,7 @@ public class BitsyTransaction implements ITransaction, ICommitChanges {
 
     // Added for Tinkerpop 3.5
     public <T extends TraversalSource> T begin(final Class<T> traversalSourceClass) {
-        throw new UnsupportedOperationException("Bitsy does not support begin(). Please use open, commit, rollback and close");
+        throw new UnsupportedOperationException(
+                "Bitsy does not support begin(). Please use open, commit, rollback and close");
     }
-
 }

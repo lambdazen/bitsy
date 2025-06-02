@@ -1,17 +1,15 @@
 package com.lambdazen.bitsy.wrapper;
 
+import com.lambdazen.bitsy.BitsyEdge;
+import com.lambdazen.bitsy.BitsyGraph;
+import com.lambdazen.bitsy.tx.BitsyTransaction;
 import java.util.Iterator;
-
 import org.apache.tinkerpop.gremlin.structure.Direction;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
-
-import com.lambdazen.bitsy.BitsyEdge;
-import com.lambdazen.bitsy.BitsyGraph;
-import com.lambdazen.bitsy.tx.BitsyTransaction;
 
 public class BitsyAutoReloadingEdge implements Edge {
     BitsyEdge edge;
@@ -23,10 +21,10 @@ public class BitsyAutoReloadingEdge implements Edge {
     }
 
     public Edge getBaseEdge() {
-        if (((BitsyTransaction)edge.getTransaction()).isStopped()) {
-            edge = (BitsyEdge)graph.edges(edge.id()).next();
+        if (((BitsyTransaction) edge.getTransaction()).isStopped()) {
+            edge = (BitsyEdge) graph.edges(edge.id()).next();
         }
-        
+
         return edge;
     }
 
@@ -49,32 +47,32 @@ public class BitsyAutoReloadingEdge implements Edge {
     public int hashCode() {
         return getBaseEdge().hashCode();
     }
-    
+
     public boolean equals(Object o) {
         return getBaseEdge().equals(o);
     }
-    
+
     public String toString() {
         return StringFactory.edgeString(this);
     }
 
-	@Override
-	public Graph graph() {
-		return getBaseEdge().graph();
-	}
+    @Override
+    public Graph graph() {
+        return getBaseEdge().graph();
+    }
 
-	@Override
-	public <V> Property<V> property(String key, V value) {
-		return getBaseEdge().property(key, value);
-	}
+    @Override
+    public <V> Property<V> property(String key, V value) {
+        return getBaseEdge().property(key, value);
+    }
 
-	@Override
-	public Iterator<Vertex> vertices(Direction direction) {
-		return new BitsyAutoReloadingGraph.VertexIterator(graph, getBaseEdge().vertices(direction));
-	}
+    @Override
+    public Iterator<Vertex> vertices(Direction direction) {
+        return new BitsyAutoReloadingGraph.VertexIterator(graph, getBaseEdge().vertices(direction));
+    }
 
-	@Override
-	public <V> Iterator<Property<V>> properties(String... propertyKeys) {
-		return getBaseEdge().properties(propertyKeys);
-	}
+    @Override
+    public <V> Iterator<Property<V>> properties(String... propertyKeys) {
+        return getBaseEdge().properties(propertyKeys);
+    }
 }

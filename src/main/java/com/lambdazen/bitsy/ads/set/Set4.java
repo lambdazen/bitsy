@@ -2,7 +2,7 @@ package com.lambdazen.bitsy.ads.set;
 
 public class Set4<T> extends PrimitiveSet<T> implements Set<T> {
     T elem0, elem1, elem2, elem3;
-    
+
     public Set4(Set3<T> oldSet, T elem) {
         this.elem0 = oldSet.elem0;
         this.elem1 = oldSet.elem1;
@@ -24,24 +24,24 @@ public class Set4<T> extends PrimitiveSet<T> implements Set<T> {
 
     protected void write(int index, T elem) {
         switch (index) {
-        case 0:
-            elem0 = elem;
-            break;
+            case 0:
+                elem0 = elem;
+                break;
 
-        case 1: 
-            elem1 = elem;
-            break;
+            case 1:
+                elem1 = elem;
+                break;
 
-        case 2: 
-            elem2 = elem;
-            break;
+            case 2:
+                elem2 = elem;
+                break;
 
-        case 3: 
-            elem3 = elem;
-            break;
+            case 3:
+                elem3 = elem;
+                break;
 
-        default: 
-            throw new IllegalArgumentException("Invalid index " + index);
+            default:
+                throw new IllegalArgumentException("Invalid index " + index);
         }
     }
 
@@ -49,7 +49,6 @@ public class Set4<T> extends PrimitiveSet<T> implements Set<T> {
     Set<T> expand(T elem) {
         return new Set6<T>(this, elem);
     }
-    
 
     @Override
     int contractThreshold() {

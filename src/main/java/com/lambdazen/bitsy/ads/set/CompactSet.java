@@ -5,7 +5,7 @@ public class CompactSet {
         if (set == null) {
             return 0;
         } else if (set instanceof Set) {
-            return ((Set)set).size();
+            return ((Set) set).size();
         } else {
             return 1;
         }
@@ -15,7 +15,7 @@ public class CompactSet {
         if (set == null) {
             return new Object[0];
         } else if (set instanceof Set) {
-            return ((Set<?>)set).getElements();
+            return ((Set<?>) set).getElements();
         } else {
             return new Object[] {set};
         }
@@ -25,7 +25,7 @@ public class CompactSet {
         if (set == null) {
             return elem;
         } else if (set instanceof Set) {
-            return ((Set)set).addElement(elem);
+            return ((Set) set).addElement(elem);
         } else {
             if (set.equals(elem)) {
                 return set;
@@ -40,15 +40,15 @@ public class CompactSet {
             // Move to ArraySet instead of SetMax to avoid cyclic dependency from CompactMultiSetMax and SetMax
             set = new ArraySet<T>(CompactSet.getElements(set));
         }
-        
+
         return CompactSet.<T>add(set, elem);
     }
-    
+
     public static <T> Object remove(Object set, T elem) {
         if (set == null) {
             return null;
         } else if (set instanceof Set) {
-            return ((Set)set).removeElement(elem);
+            return ((Set) set).removeElement(elem);
         } else {
             if ((set == elem) || (set.equals(elem))) {
                 return null;

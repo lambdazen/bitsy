@@ -1,13 +1,11 @@
 package com.lambdazen.bitsy.store;
 
-import java.io.Serializable;
-import java.util.TreeMap;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lambdazen.bitsy.UUID;
 import com.lambdazen.bitsy.ads.dict.Dictionary;
-import com.lambdazen.bitsy.ads.set.CompactSet;
+import java.io.Serializable;
+import java.util.TreeMap;
 
 public class VertexBean extends UUID implements Serializable {
     private static final long serialVersionUID = -2867517568410927192L;
@@ -15,7 +13,7 @@ public class VertexBean extends UUID implements Serializable {
     int version;
     String label;
     Dictionary properties;
-    
+
     Object outEdges;
     Object inEdges;
 
@@ -26,7 +24,7 @@ public class VertexBean extends UUID implements Serializable {
         this.properties = properties;
         this.version = version;
     }
-    
+
     /** Shallow copy constructor */
     public VertexBean(VertexBean orig) {
         super(orig.getMostSignificantBits(), orig.getLeastSignificantBits());
@@ -40,7 +38,7 @@ public class VertexBean extends UUID implements Serializable {
 
     @JsonIgnore
     public UUID getId() {
-        // I am the ID! Saves on object creation and equals checks. 
+        // I am the ID! Saves on object creation and equals checks.
         return this;
     }
 
@@ -63,7 +61,7 @@ public class VertexBean extends UUID implements Serializable {
             return ans;
         }
     }
-    
+
     @JsonIgnore
     public Dictionary getPropertiesDict() {
         return properties;
@@ -76,8 +74,8 @@ public class VertexBean extends UUID implements Serializable {
 
     @JsonProperty("l")
     public String getLabel() {
-		return label;
-	}
+        return label;
+    }
 
     public void copyFrom(VertexBean vBean) {
         this.version = vBean.version;

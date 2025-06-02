@@ -1,23 +1,25 @@
 package com.lambdazen.bitsy;
 
+import com.lambdazen.bitsy.ads.dict.Dictionary;
+import com.lambdazen.bitsy.ads.dict.Dictionary1;
+import com.lambdazen.bitsy.tx.BitsyTransaction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-
 import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 
-import com.lambdazen.bitsy.ads.dict.Dictionary;
-import com.lambdazen.bitsy.ads.dict.Dictionary1;
-import com.lambdazen.bitsy.tx.BitsyTransaction;
-
 public abstract class BitsyElement implements Element {
-	public static enum PropType {ELEMENT, VERTEX, EDGE}; 
+    public static enum PropType {
+        ELEMENT,
+        VERTEX,
+        EDGE
+    };
 
     Object id;
     String label;
@@ -26,8 +28,9 @@ public abstract class BitsyElement implements Element {
     BitsyState state;
     int version;
     boolean updated;
-    
-    public BitsyElement(Object id, String label, Dictionary properties, BitsyTransaction tx, BitsyState state, int version) {
+
+    public BitsyElement(
+            Object id, String label, Dictionary properties, BitsyTransaction tx, BitsyState state, int version) {
         this.id = id;
         this.label = label;
         this.properties = properties;
@@ -45,7 +48,7 @@ public abstract class BitsyElement implements Element {
 
     @Override
     public String label() {
-        // There is no Tx validation for label because it is used even after deletion to update indexes, etc. 
+        // There is no Tx validation for label because it is used even after deletion to update indexes, etc.
         return label;
     }
 
@@ -53,13 +56,13 @@ public abstract class BitsyElement implements Element {
     public Graph graph() {
         return tx.graph();
     }
-    
+
     public Dictionary getPropertyDict() {
         return properties;
     }
 
     @Override
-    public <T>T value(String key) {
+    public <T> T value(String key) {
         tx.validateForQuery(this);
 
         if (properties == null) {
@@ -72,7 +75,7 @@ public abstract class BitsyElement implements Element {
     @Override
     public Set<String> keys() {
         tx.validateForQuery(this);
-        
+
         if (properties == null) {
             return Collections.emptySet();
         } else {
@@ -80,44 +83,45 @@ public abstract class BitsyElement implements Element {
         }
     }
 
-    public <T>T removeProperty(String key) {
+    public <T> T removeProperty(String key) {
         markForUpdate();
 
         if (properties == null) {
-        	return null;
+            return null;
         } else {
-        	Object ans = properties.getProperty(key);
+            Object ans = properties.getProperty(key);
 
-        	properties = properties.removeProperty(key);
+            properties = properties.removeProperty(key);
 
-        	return (T)ans;
+            return (T) ans;
         }
     }
 
     @Override
     public <T> Property<T> property(String key, T value) {
         if (value == null) {
-            throw new IllegalArgumentException("A null property can not be stored. You can call removeProperty() instead");
+            throw new IllegalArgumentException(
+                    "A null property can not be stored. You can call removeProperty() instead");
         }
 
         markForUpdate();
 
         if (key == null) {
-        	throw new IllegalArgumentException("Expecting non-null key in setProperty");
+            throw new IllegalArgumentException("Expecting non-null key in setProperty");
         } else if (key.length() == 0) {
-        	throw new IllegalArgumentException("Expecting non-empty key in setProperty");
+            throw new IllegalArgumentException("Expecting non-empty key in setProperty");
         } else if (key.equals("id")) {
-        	throw new IllegalArgumentException("Can not set the 'id' property on an element");
+            throw new IllegalArgumentException("Can not set the 'id' property on an element");
         } else if (key.equals("label")) {
-        	throw new IllegalArgumentException("Can not set the 'label' property on an element");
+            throw new IllegalArgumentException("Can not set the 'label' property on an element");
         } else if (key.charAt(0) == '~') {
-        	throw new IllegalArgumentException("Can not set a property beginning with ~ on an element");
+            throw new IllegalArgumentException("Can not set a property beginning with ~ on an element");
         }
 
         if (this.properties == null) {
-        	this.properties = new Dictionary1(key, value);
+            this.properties = new Dictionary1(key, value);
         } else {
-        	this.properties = properties.setProperty(key, value);
+            this.properties = properties.setProperty(key, value);
         }
 
         assert (properties != null);
@@ -141,13 +145,13 @@ public abstract class BitsyElement implements Element {
     public <T> Iterator<? extends Property<T>> properties(String... propertyKeys) {
         ArrayList<Property<T>> ans = new ArrayList<Property<T>>();
         if (propertyKeys.length == 0) {
-        	if (this.properties == null) return Collections.emptyIterator();
-        	propertyKeys = this.properties.getPropertyKeys();
+            if (this.properties == null) return Collections.emptyIterator();
+            propertyKeys = this.properties.getPropertyKeys();
         }
 
         for (String key : propertyKeys) {
-        	Property<T> prop = property(key);
-        	if (prop.isPresent()) ans.add(prop);
+            Property<T> prop = property(key);
+            if (prop.isPresent()) ans.add(prop);
         }
 
         return ans.iterator();
@@ -157,7 +161,7 @@ public abstract class BitsyElement implements Element {
     public void markForUpdate() {
         if (!updated) {
             updated = true;
-            
+
             // Make a copy of the underlying property map, if non-null
             if (properties != null) {
                 properties = properties.copyOf();
@@ -173,7 +177,7 @@ public abstract class BitsyElement implements Element {
     public BitsyState getState() {
         return state;
     }
-    
+
     public void setState(BitsyState state) {
         this.state = state;
     }
@@ -194,6 +198,6 @@ public abstract class BitsyElement implements Element {
 
     @Override
     public boolean equals(Object object) {
-    	return ElementHelper.areEqual(this, object);
+        return ElementHelper.areEqual(this, object);
     }
 }

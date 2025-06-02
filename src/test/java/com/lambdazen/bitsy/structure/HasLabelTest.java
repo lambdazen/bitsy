@@ -1,14 +1,14 @@
 package com.lambdazen.bitsy.structure;
 
+import static org.junit.Assert.assertTrue;
+
 import com.lambdazen.bitsy.BitsyGraph;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.tinkerpop.gremlin.process.traversal.P;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.junit.Test;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class HasLabelTest {
     @Test

@@ -1,6 +1,6 @@
 package com.lambdazen.bitsy.ads.set;
 
-/** A bag keeps an unordered, unstable collection of elements */ 
+/** A bag keeps an unordered, unstable collection of elements */
 public interface Set<T> {
     public int size();
 

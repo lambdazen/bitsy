@@ -1,8 +1,5 @@
 package com.lambdazen.bitsy.store;
 
-import java.io.Serializable;
-import java.util.TreeMap;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -10,6 +7,8 @@ import com.lambdazen.bitsy.BitsyState;
 import com.lambdazen.bitsy.UUID;
 import com.lambdazen.bitsy.ads.dict.Dictionary;
 import com.lambdazen.bitsy.ads.dict.DictionaryFactory;
+import java.io.Serializable;
+import java.util.TreeMap;
 
 @JsonPropertyOrder({"id", "v", "s", "p"})
 public final class VertexBeanJson extends VertexBean implements Serializable {
@@ -18,10 +17,11 @@ public final class VertexBeanJson extends VertexBean implements Serializable {
     BitsyState state;
 
     @JsonCreator
-    public VertexBeanJson(@JsonProperty("id") String uuidStr, 
-    		@JsonProperty("l") String label,
-            @JsonProperty("p") TreeMap<String, Object> properties, 
-            @JsonProperty("v") int version, 
+    public VertexBeanJson(
+            @JsonProperty("id") String uuidStr,
+            @JsonProperty("l") String label,
+            @JsonProperty("p") TreeMap<String, Object> properties,
+            @JsonProperty("v") int version,
             @JsonProperty("s") BitsyState state) {
         super(UUID.fromString(uuidStr), label, DictionaryFactory.fromMap(properties), version);
 

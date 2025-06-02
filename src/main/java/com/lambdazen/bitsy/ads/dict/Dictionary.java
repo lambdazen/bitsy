@@ -7,19 +7,19 @@ import com.lambdazen.bitsy.store.IStringCanonicalizer;
  * and remove methods return a reference to a new map with the value.
  */
 public interface Dictionary {
-	public int size();
-	
-	public Object getProperty(String key);
-	
-	public String[] getPropertyKeys();
-	
-	public Dictionary setProperty(String key, Object value);
+    public int size();
 
-	public Dictionary removeProperty(String key);
-	
-	public Dictionary copyOf();
-	
-//	public TreeMap<String, Object> toMap();
-	
-	public void canonicalizeKeys(IStringCanonicalizer canonicalizer);
+    public Object getProperty(String key);
+
+    public String[] getPropertyKeys();
+
+    public Dictionary setProperty(String key, Object value);
+
+    public Dictionary removeProperty(String key);
+
+    public Dictionary copyOf();
+
+    //	public TreeMap<String, Object> toMap();
+
+    public void canonicalizeKeys(IStringCanonicalizer canonicalizer);
 }

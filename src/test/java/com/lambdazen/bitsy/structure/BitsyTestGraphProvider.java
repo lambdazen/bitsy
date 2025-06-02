@@ -1,25 +1,26 @@
 package com.lambdazen.bitsy.structure;
 
+import com.lambdazen.bitsy.BitsyGraph;
+import com.lambdazen.bitsy.BitsyIsolationLevel;
+import com.lambdazen.bitsy.wrapper.BitsyAutoReloadingGraph;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.AbstractGraphProvider;
 import org.apache.tinkerpop.gremlin.LoadGraphWith.GraphData;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Transaction.READ_WRITE_BEHAVIOR;
 
-import com.lambdazen.bitsy.BitsyGraph;
-import com.lambdazen.bitsy.BitsyIsolationLevel;
-import com.lambdazen.bitsy.wrapper.BitsyAutoReloadingGraph;
-
 public class BitsyTestGraphProvider extends AbstractGraphProvider {
-    private static final Set<Class> IMPLEMENTATION = new HashSet<Class>() {{
+    private static final Set<Class> IMPLEMENTATION = new HashSet<Class>() {
+        {
             add(BitsyAutoReloadingGraph.class);
-        }};
+        }
+    };
 
     @Override
     public void clear(Graph graph, Configuration configuration) throws Exception {
@@ -48,27 +49,27 @@ public class BitsyTestGraphProvider extends AbstractGraphProvider {
         if (directory.exists()) {
             for (File file : directory.listFiles()) {
                 if (file.isDirectory()) {
-                    //System.out.println("Deleting dir: " + file.toString());
+                    // System.out.println("Deleting dir: " + file.toString());
                     deleteDirectory(file, true);
                 } else {
-                    //System.out.println("Deleting file: " + file.toString());
+                    // System.out.println("Deleting file: " + file.toString());
                     file.delete();
                 }
             }
 
             if (deleteDir) {
-                //System.out.println("Deleting dir: " + directory);
+                // System.out.println("Deleting dir: " + directory);
                 directory.delete();
             }
         }
-        //System.out.println("Exiting delete dir");
+        // System.out.println("Exiting delete dir");
     }
 
     @Override
-    public Map<String, Object> getBaseConfiguration(String graphName, Class<?> test, String testMethodName,
-                                                    GraphData loadGraphWith) {
+    public Map<String, Object> getBaseConfiguration(
+            String graphName, Class<?> test, String testMethodName, GraphData loadGraphWith) {
         final String directory = makeTestDirectory(graphName, test, testMethodName);
-        File testDataRootFile = new File(directory);
+        File testDataRootFile = Paths.get(directory).toFile();
         testDataRootFile.mkdirs();
 
         try {
@@ -82,12 +83,14 @@ public class BitsyTestGraphProvider extends AbstractGraphProvider {
 
         String testDataRoot = testDataRootFile.getPath();
 
-        return new HashMap<String, Object>() {{
-            put(Graph.GRAPH, BitsyAutoReloadingGraph.class.getName());
-            put(BitsyGraph.DB_PATH_KEY, testDataRoot);
-            put(BitsyGraph.CREATE_DIR_IF_MISSING_KEY, true);
-            put(BitsyGraph.DEFAULT_ISOLATION_LEVEL_KEY, BitsyIsolationLevel.READ_COMMITTED.toString());
-            put(BitsyGraph.VERTEX_INDICES_KEY, "name, foo");
-        }};
+        return new HashMap<String, Object>() {
+            {
+                put(Graph.GRAPH, BitsyAutoReloadingGraph.class.getName());
+                put(BitsyGraph.DB_PATH_KEY, testDataRoot);
+                put(BitsyGraph.CREATE_DIR_IF_MISSING_KEY, true);
+                put(BitsyGraph.DEFAULT_ISOLATION_LEVEL_KEY, BitsyIsolationLevel.READ_COMMITTED.toString());
+                put(BitsyGraph.VERTEX_INDICES_KEY, "name, foo");
+            }
+        };
     }
 }

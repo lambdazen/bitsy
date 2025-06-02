@@ -13,7 +13,7 @@ public class BitsyFeatures implements Features {
     private boolean isPersistent;
 
     public BitsyFeatures(boolean isPersistent) {
-        this.isPersistent = isPersistent; 
+        this.isPersistent = isPersistent;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class BitsyFeatures implements Features {
 
     @Override
     public String toString() {
-    	return StringFactory.featureString(this);
+        return StringFactory.featureString(this);
     }
 
     public class BitsyGraphFeatures implements Features.GraphFeatures {
@@ -55,14 +55,14 @@ public class BitsyFeatures implements Features {
         }
 
         // Yes for transactions
-        
-        // TODO: Change from no for threaded transactions to yes -- semantics seems to have changed per shouldNotReuseThreadedTransaction
+
+        // TODO: Change from no for threaded transactions to yes -- semantics seems to have changed per
+        // shouldNotReuseThreadedTransaction
         @Override
         public boolean supportsThreadedTransactions() {
-        	return false;
+            return false;
         }
     }
-
 
     public class BitsyVariableFeatures implements Features.VariableFeatures {
         @Override
@@ -72,82 +72,95 @@ public class BitsyFeatures implements Features {
 
         @Override
         public boolean supportsBooleanValues() {
-        	return false;
+            return false;
         }
 
         @Override
         public boolean supportsDoubleValues() {
-        	return false;
+            return false;
         }
 
         @Override
         public boolean supportsFloatValues() {
-        	return false;
+            return false;
         }
 
         @Override
         public boolean supportsIntegerValues() {
-        	return false;
+            return false;
         }
 
         @Override
         public boolean supportsLongValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsMapValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsMixedListValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsByteValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsBooleanArrayValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsByteArrayValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsDoubleArrayValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsFloatArrayValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsIntegerArrayValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsLongArrayValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsSerializableValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsStringValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsUniformListValues() {
-        	return false;
+            return false;
         }
+
         @Override
         public boolean supportsStringArrayValues() {
-        	return false;
+            return false;
         }
     }
-    
+
     public class BitsyVertexFeatures implements Features.VertexFeatures {
         private final Features.VertexPropertyFeatures vertexPropertyFeatures = new BitsyGraphPropertyFeatures();
 
@@ -173,12 +186,12 @@ public class BitsyFeatures implements Features {
 
         @Override
         public boolean supportsNumericIds() {
-        	return false;
+            return false;
         }
 
         @Override
         public boolean supportsAnyIds() {
-        	return false;
+            return false;
         }
 
         // Yes for add and remove vertices
@@ -199,12 +212,12 @@ public class BitsyFeatures implements Features {
 
         @Override
         public boolean supportsNumericIds() {
-        	return false;
+            return false;
         }
 
         @Override
         public boolean supportsAnyIds() {
-        	return false;
+            return false;
         }
 
         // Yes for add and remove edges

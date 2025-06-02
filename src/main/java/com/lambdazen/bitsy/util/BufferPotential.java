@@ -14,7 +14,7 @@ public interface BufferPotential<T> {
      * Otherwise, it can return false.
      */
     public boolean addWork(T newWork);
-    
+
     /**
      * This method is called to reset the potential, when the double buffer
      * flips the enqueue buffer
