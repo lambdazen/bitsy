@@ -42,6 +42,7 @@
   <scm>
     <connection>scm:git:https://github.com/lambdazen/bitsy.git</connection>
     <developerConnection>scm:git:https://github.com/lambdazen/bitsy.git</developerConnection>
+    <tag>HEAD</tag>
     <url>https://github.com/lambdazen/bitsy/</url>
   </scm>
 
