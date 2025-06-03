@@ -1,4 +1,4 @@
-![Bitsy Logo](https://www.lambdazen.com/bitsy/BitsyLogoXS.png)
+[![Maven Central](https://img.shields.io/maven-central/v/com.lambdazen/bitsy.svg?label=Maven%20Central)](https://search.maven.org/artifact/com.lambdazen/bitsy)
 
 Bitsy is a small, fast, embeddable, durable in-memory graph database that is compatible with Tinkerpop3. 
 
