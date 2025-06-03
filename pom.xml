@@ -128,297 +128,90 @@
       <scope>test</scope>
     </dependency>
  -->
-
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>sonatype-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </repository>
-  </repositories>
-
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>3.4.1</version>
-      </plugin>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <showDeprecation>true</showDeprecation>
+          </configuration>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.3.1</version>
-      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <reuseForks>false</reuseForks>
+            <forkCount>1</forkCount>
+            <failIfNoTests>false</failIfNoTests>
+            <argLine>@{jacocoAgentArg} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+              <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
+              <build.dir>${project.build.directory}</build.dir>
+            </systemPropertyVariables>
+            <includes>
+              <include>**/*Test.java</include>
+              <include>**/*TestCase.java</include>
+            </includes>
+          </configuration>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.14.0</version>
-        <configuration>
-          <showDeprecation>true</showDeprecation>
-        </configuration>
-      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <configuration>
+            <reuseForks>false</reuseForks>
+            <forkCount>1</forkCount>
+            <failIfNoTests>false</failIfNoTests>
+            <argLine>@{jacocoAgentArg} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
+            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+            <systemPropertyVariables>
+              <java.awt.headless>true</java.awt.headless>
+              <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
+              <build.dir>${project.build.directory}</build.dir>
+            </systemPropertyVariables>
+            <includes>
+              <include>**/*IT.java</include>
+              <include>**/*ITCase.java</include>
+              <include>**/*TestSuite.java</include>
+            </includes>
+          </configuration>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.4.2</version>
-      </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <!-- Turn off strict javadoc checks in Java-8 -->
+            <doclint>none</doclint>
+            <!-- Make it less fragile -->
+            <detectLinks>false</detectLinks>
+            <!-- Source == release -->
+            <source>${maven.compiler.release}</source>
+          </configuration>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.5.3</version>
-        <configuration>
-          <reuseForks>false</reuseForks>
-          <forkCount>1</forkCount>
-          <failIfNoTests>false</failIfNoTests>
-          <argLine>@{jacocoAgentArg} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-          <systemPropertyVariables>
-            <java.awt.headless>true</java.awt.headless>
-            <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
-          </systemPropertyVariables>
-          <includes>
-            <include>**/*Test.java</include>
-            <include>**/*TestCase.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.5.3</version>
-        <configuration>
-          <reuseForks>false</reuseForks>
-          <forkCount>1</forkCount>
-          <failIfNoTests>false</failIfNoTests>
-          <argLine>@{jacocoAgentArg} --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-          <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-          <systemPropertyVariables>
-            <java.awt.headless>true</java.awt.headless>
-            <java.io.tmpdir>${java.io.tmpdir}</java.io.tmpdir>
-          </systemPropertyVariables>
-          <includes>
-            <include>**/*IT.java</include>
-            <include>**/*ITCase.java</include>
-            <include>**/*TestSuite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-install-plugin</artifactId>
-        <version>3.1.4</version>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.1.4</version>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>3.2.7</version>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.3.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.11.2</version>
-        <configuration>
-          <!-- Turn off strict javadoc checks in Java-8 -->
-          <doclint>none</doclint>
-          <!-- Make it less fragile -->
-          <detectLinks>false</detectLinks>
-          <!-- Source is 8 -->
-          <source>8</source>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-release-plugin</artifactId>
-        <version>3.1.1</version>
-        <configuration>
-          <localCheckout>true</localCheckout>
-          <pushChanges>false</pushChanges>
-          <autoVersionSubmodules>true</autoVersionSubmodules>
-          <goals>deploy</goals>
-          <mavenExecutorId>forked-path</mavenExecutorId>
-          <releaseProfiles>bitsy-release</releaseProfiles>
-          <useReleaseProfile>false</useReleaseProfile>
-          <tagNameFormat>release-@{project.version}</tagNameFormat>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.21.0</version>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
-        <executions>
-          <execution>
-            <id>enforce</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>[3.9,)</version>
-                </requireMavenVersion>
-                <requireJavaVersion>
-                  <version>[21,)</version>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.13</version>
-        <configuration>
-          <propertyName>jacocoAgentArg</propertyName>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.8.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <phase>install</phase>
-            <configuration>
-              <outputDirectory>${project.build.directory}/lib</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.13</version>
+          <configuration>
+            <propertyName>jacocoAgentArg</propertyName>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <profiles>
-    <!--
-    Release configuration.
-    -->
-    <profile>
-      <id>bitsy-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>enforce-release</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <!--
-                    Disallow SNAPSHOT dependencies.
-                    -->
-                    <requireReleaseDeps>
-                      <searchTransitive>true</searchTransitive>
-                      <failWhenParentIsSnapshot>true</failWhenParentIsSnapshot>
-                    </requireReleaseDeps>
-
-                    <!--
-                    Disallow SNAPSHOT, RELEASE, LATEST or pinned-SNAPSHOT plugins.
-                    -->
-                    <requirePluginVersions>
-                      <banSnapshots>true</banSnapshots>
-                      <banRelease>true</banRelease>
-                      <banLatest>true</banLatest>
-                      <banTimestamps>true</banTimestamps>
-                    </requirePluginVersions>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <configuration>
-              <bestPractices>true</bestPractices>
-              <useAgent>true</useAgent>
-            </configuration>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
     <!--
     Enable running of integration-tests.
     -->
