@@ -10,7 +10,7 @@
 
   <groupId>com.lambdazen.bitsy</groupId>
   <artifactId>bitsy</artifactId>
-  <version>3.6.3-SNAPSHOT</version>
+  <version>3.6.3</version>
 
   <name>Bitsy Graph Database</name>
   <description>Bitsy v3 is a small, fast, embeddable, durable in-memory graph database that is compatible with Tinkerpop3</description>
@@ -42,7 +42,7 @@
   <scm>
     <connection>scm:git:https://github.com/lambdazen/bitsy.git</connection>
     <developerConnection>scm:git:https://github.com/lambdazen/bitsy.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>release-3.6.3</tag>
     <url>https://github.com/lambdazen/bitsy/</url>
   </scm>
 
