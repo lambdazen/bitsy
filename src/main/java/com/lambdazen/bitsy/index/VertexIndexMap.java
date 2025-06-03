@@ -1,8 +1,7 @@
 package com.lambdazen.bitsy.index;
 
-import java.util.Iterator;
-
 import com.lambdazen.bitsy.store.VertexBean;
+import java.util.Iterator;
 
 public class VertexIndexMap extends BitsyIndexMap<VertexBean, VertexIndex> {
     public VertexIndexMap() {

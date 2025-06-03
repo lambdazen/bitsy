@@ -1,19 +1,5 @@
 package com.lambdazen.bitsy.store;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.tinkerpop.gremlin.structure.Direction;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Element;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-
 import com.lambdazen.bitsy.BitsyEdge;
 import com.lambdazen.bitsy.BitsyErrorCodes;
 import com.lambdazen.bitsy.BitsyException;
@@ -27,21 +13,34 @@ import com.lambdazen.bitsy.UUID;
 import com.lambdazen.bitsy.index.EdgeIndexMap;
 import com.lambdazen.bitsy.index.VertexIndexMap;
 import com.lambdazen.bitsy.tx.BitsyTransaction;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Element;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 
 /**
  * This class implements a MapDB-backed store for a graph, along with its key
  * indexes.
  */
 public class MemoryGraphStore implements IGraphStore {
-//    private static final Logger log = LoggerFactory.getLogger(MemoryGraphStore.class);
+    //    private static final Logger log = LoggerFactory.getLogger(MemoryGraphStore.class);
 
-    private static final int MAX_COUNTER_INCREASE_BEFORE_READ_LOCK = 2 * 5; // After 5 writes go through, the reader will lock
+    private static final int MAX_COUNTER_INCREASE_BEFORE_READ_LOCK =
+            2 * 5; // After 5 writes go through, the reader will lock
     private static final int MAX_RETRIES_BEFORE_READ_LOCK = 3; // After 3 writes go through, the reader will lock
 
     private ReadWriteLock rwLock;
-    
+
     private AtomicLong spinCounter;
-    
+
     private Map<UUID, VertexBean> vertices;
 
     // Map from VertexBean.getUUID().hashCode() -> VertexBean
@@ -96,7 +95,7 @@ public class MemoryGraphStore implements IGraphStore {
             checkForConcurrentModifications(changes, incrementVersions);
 
             saveChanges(changes);
-            
+
             if (r != null) {
                 r.run();
             }
@@ -107,32 +106,32 @@ public class MemoryGraphStore implements IGraphStore {
 
     private void beginWrite() {
         rwLock.writeLock().lock();
-       
+
         // There is a possibility that the counter is odd. This happens when a
         // writer thread is done unlocking, but not done incrementing the
         // counter. Calling beginRead() ensures that the counter is even
         RetryDetails retryDetails = new RetryDetails();
         beginRead(retryDetails, false);
-        
+
         assert (retryDetails.counter & 1L) == 0L : "Bug in beginRead -- counter is odd!"; // must be even
         long newCounter = (retryDetails.counter + 1) & 0x3fffffffffffffffL; // Don't let it go negative
-        
+
         boolean updated = spinCounter.compareAndSet(retryDetails.counter, newCounter);
         assert updated : "Someone messed with an even counter without a lock!";
     }
-    
+
     private void endWrite() {
         // Unlock first -- this creates the synchronization barrier ensuring
-        // that all writes are visible to readers 
+        // that all writes are visible to readers
         rwLock.writeLock().unlock();
 
         // Now increment the counter allowing readers & writers to proceed
         // At this point -- both readers and writers will wait till the counter
-        // turns even 
+        // turns even
         long counter = spinCounter.get();
         assert (counter & 1L) == 1L : "Some writer did not leave the counter odd!"; // must be odd
         long newCounter = (counter + 1) & 0x3fffffffffffffffL; // Don't let it go negative
-        
+
         boolean updated = spinCounter.compareAndSet(counter, newCounter);
         assert updated : "Someone messed with the counter without a lock!";
     }
@@ -145,31 +144,31 @@ public class MemoryGraphStore implements IGraphStore {
             long tryCount = retryDetails.counter - retryDetails.startCounter;
 
             // The counter is odd -- which means that a write is in process
-            if (degradeToReadLock 
+            if (degradeToReadLock
                     && ((tryCount > MAX_COUNTER_INCREASE_BEFORE_READ_LOCK)
-                            || (retryDetails.retryCount > MAX_RETRIES_BEFORE_READ_LOCK)) ) {
+                            || (retryDetails.retryCount > MAX_RETRIES_BEFORE_READ_LOCK))) {
                 rwLock.readLock().lock();
-                
+
                 retryDetails.counter = -1;
                 return;
             }
-            
+
             // No work left for this thread
             Thread.yield();
-            
+
             // Try again
             retryDetails.counter = spinCounter.get();
         }
-        
-        assert((retryDetails.counter & 1L) == 0L);
+
+        assert ((retryDetails.counter & 1L) == 0L);
     }
-    
+
     private void endRead(RetryDetails retryDetails) {
         if (retryDetails.counter == -1) {
             rwLock.readLock().unlock();
         }
     }
-    
+
     private boolean shouldRetryRead(RetryDetails retryDetails) {
         // Retry if there is no read lock AND the counter doesn't match
         if (retryDetails.counter == -1) {
@@ -198,16 +197,18 @@ public class MemoryGraphStore implements IGraphStore {
             UUID key = (UUID) vertex.id();
 
             switch (vertex.getState()) {
-            case U:
-                break;
+                case U:
+                    break;
 
-            case D:
-            case M:
-                VertexBean vb = vertices.get(key);
-                if (vb != null && (vb.getVersion() + 1 != vertex.getVersion())) {
-                    throw new BitsyRetryException(BitsyErrorCodes.CONCURRENT_MODIFICATION, "Vertex " + key + " was modified. Loaded version "
-                            + (vertex.getVersion() - 1) + ". Current version in DB: " + vb.getVersion());
-                }
+                case D:
+                case M:
+                    VertexBean vb = vertices.get(key);
+                    if (vb != null && (vb.getVersion() + 1 != vertex.getVersion())) {
+                        throw new BitsyRetryException(
+                                BitsyErrorCodes.CONCURRENT_MODIFICATION,
+                                "Vertex " + key + " was modified. Loaded version " + (vertex.getVersion() - 1)
+                                        + ". Current version in DB: " + vb.getVersion());
+                    }
             }
         }
 
@@ -221,16 +222,18 @@ public class MemoryGraphStore implements IGraphStore {
             UUID key = (UUID) edge.id();
 
             switch (edge.getState()) {
-            case U:
-                break;
+                case U:
+                    break;
 
-            case D:
-            case M:
-                EdgeBean eb = edges.get(key);
-                if (eb != null && (eb.getVersion() + 1) != edge.getVersion()) {
-                    throw new BitsyRetryException(BitsyErrorCodes.CONCURRENT_MODIFICATION, "Edge " + key + " was modified. Loaded version "
-                            + (edge.getVersion() - 1) + ". Current version in DB: " + eb.getVersion());
-                }
+                case D:
+                case M:
+                    EdgeBean eb = edges.get(key);
+                    if (eb != null && (eb.getVersion() + 1) != edge.getVersion()) {
+                        throw new BitsyRetryException(
+                                BitsyErrorCodes.CONCURRENT_MODIFICATION,
+                                "Edge " + key + " was modified. Loaded version " + (edge.getVersion() - 1)
+                                        + ". Current version in DB: " + eb.getVersion());
+                    }
             }
         }
     }
@@ -238,7 +241,7 @@ public class MemoryGraphStore implements IGraphStore {
     protected long saveChanges(ICommitChanges changes) {
         return saveChanges(changes, null);
     }
-    
+
     // This method is used by commit (with increment option) and the initial
     // load from DB (without increment option)
     protected long saveChanges(ICommitChanges changes, IStringCanonicalizer canonicalizer) {
@@ -261,44 +264,44 @@ public class MemoryGraphStore implements IGraphStore {
         UUID key = (UUID) edge.id();
 
         switch (edge.getState()) {
-        case U:
-            break;
+            case U:
+                break;
 
-        case D:
-            eIndexMap.remove(edges.get(key));
-            //log.debug("Removing edge {}", edge.getId());
+            case D:
+                eIndexMap.remove(edges.get(key));
+                // log.debug("Removing edge {}", edge.getId());
 
-            // Remove this edge from incoming and outgoing vertices
-            EdgeBean eBeanToRemove = edges.remove(key);
-            adjMap.removeEdgeWithoutCallback(eBeanToRemove);
-            addedVE--;
+                // Remove this edge from incoming and outgoing vertices
+                EdgeBean eBeanToRemove = edges.remove(key);
+                adjMap.removeEdgeWithoutCallback(eBeanToRemove);
+                addedVE--;
 
-            break;
+                break;
 
-        case M:
-            EdgeBean eBean = (canonicalizer == null) ? asBean(edge) : asBean(edge, canonicalizer);
-            if (eBean == null) {
-                //log.debug("Skipping edge {}", edge.getId());
-            } else {
-                //log.debug("Modifying edge {}", edge.getId());
-                EdgeBean oldEBean = edges.get(key);
-                eIndexMap.remove(oldEBean);
-                eIndexMap.add(eBean);
-
-                EdgeBean oldEBean2 = edges.put(eBean, eBean);
-                
-                // NOTE: Because this is a write operation, there is an
-                // exclusive lock -- no one else is updating eIndexMap
-                assert (oldEBean == oldEBean2);
-
-                if (oldEBean != null) {
-                    adjMap.removeEdgeWithoutCallback(oldEBean); // Don't callback                    
+            case M:
+                EdgeBean eBean = (canonicalizer == null) ? asBean(edge) : asBean(edge, canonicalizer);
+                if (eBean == null) {
+                    // log.debug("Skipping edge {}", edge.getId());
                 } else {
-                    addedVE++;
+                    // log.debug("Modifying edge {}", edge.getId());
+                    EdgeBean oldEBean = edges.get(key);
+                    eIndexMap.remove(oldEBean);
+                    eIndexMap.add(eBean);
+
+                    EdgeBean oldEBean2 = edges.put(eBean, eBean);
+
+                    // NOTE: Because this is a write operation, there is an
+                    // exclusive lock -- no one else is updating eIndexMap
+                    assert (oldEBean == oldEBean2);
+
+                    if (oldEBean != null) {
+                        adjMap.removeEdgeWithoutCallback(oldEBean); // Don't callback
+                    } else {
+                        addedVE++;
+                    }
+
+                    adjMap.addEdge(eBean);
                 }
-                
-                adjMap.addEdge(eBean);
-            }
         }
         return addedVE;
     }
@@ -307,32 +310,32 @@ public class MemoryGraphStore implements IGraphStore {
         UUID key = (UUID) vertex.id();
 
         switch (vertex.getState()) {
-        case U:
-            break;
+            case U:
+                break;
 
-        case D:
-            //log.debug("Deleting vertex {}", key);
-            vIndexMap.remove(vertices.get(key));
-            VertexBean vBeanToRemove = vertices.remove(key);
-            adjMap.removeVertex(vBeanToRemove);
-            addedVE--;
+            case D:
+                // log.debug("Deleting vertex {}", key);
+                vIndexMap.remove(vertices.get(key));
+                VertexBean vBeanToRemove = vertices.remove(key);
+                adjMap.removeVertex(vBeanToRemove);
+                addedVE--;
 
-            break;
+                break;
 
-        case M:
-            //log.debug("Updating vertex {}", key);
-            VertexBean vBean = (canonicalizer == null) ? vertex.asBean() : vertex.asBean(canonicalizer);
-            VertexBean oldVBean = vertices.get(key); 
-            vIndexMap.remove(oldVBean);
+            case M:
+                // log.debug("Updating vertex {}", key);
+                VertexBean vBean = (canonicalizer == null) ? vertex.asBean() : vertex.asBean(canonicalizer);
+                VertexBean oldVBean = vertices.get(key);
+                vIndexMap.remove(oldVBean);
 
-            if (oldVBean == null) {
-                vertices.put(vBean, vBean);
-                vIndexMap.add(vBean);
-                addedVE++;
-            } else {
-                oldVBean.copyFrom(vBean);
-                vIndexMap.add(oldVBean);
-            }
+                if (oldVBean == null) {
+                    vertices.put(vBean, vBean);
+                    vIndexMap.add(vBean);
+                    addedVE++;
+                } else {
+                    oldVBean.copyFrom(vBean);
+                    vIndexMap.add(oldVBean);
+                }
         }
         return addedVE;
     }
@@ -345,7 +348,7 @@ public class MemoryGraphStore implements IGraphStore {
 
     public EdgeBean getEdge(UUID id) {
         // This method is only for internal use
-        // Not using a read lock because the ID is available 
+        // Not using a read lock because the ID is available
         return edges.get(id);
     }
 
@@ -357,7 +360,7 @@ public class MemoryGraphStore implements IGraphStore {
         try {
             do {
                 beginRead(retryDetails, true);
-    
+
                 VertexBean bean = getVertex(id);
                 if (bean != null) {
                     ans = new BitsyVertex(bean, tx, BitsyState.U);
@@ -374,21 +377,21 @@ public class MemoryGraphStore implements IGraphStore {
     public BitsyEdge getBitsyEdge(BitsyTransaction tx, UUID id) {
         RetryDetails retryDetails = new RetryDetails();
         BitsyEdge ans = null;
-        
+
         try {
             do {
                 beginRead(retryDetails, true);
-                
+
                 EdgeBean bean = getEdge(id);
                 if (bean != null) {
                     ans = new BitsyEdge(bean, tx, BitsyState.U);
                 }
-                
+
             } while (shouldRetryRead(retryDetails));
         } finally {
             endRead(retryDetails);
         }
-        
+
         return ans;
     }
 
@@ -406,7 +409,7 @@ public class MemoryGraphStore implements IGraphStore {
         } finally {
             endRead(retryDetails);
         }
-        
+
         return ans;
     }
 
@@ -437,7 +440,8 @@ public class MemoryGraphStore implements IGraphStore {
             } else if (elementType.equals(Edge.class)) {
                 eIndexMap.createKeyIndex(key, getAllEdges().iterator());
             } else {
-                throw new BitsyException(BitsyErrorCodes.UNSUPPORTED_INDEX_TYPE, "Encountered index type: " + elementType);
+                throw new BitsyException(
+                        BitsyErrorCodes.UNSUPPORTED_INDEX_TYPE, "Encountered index type: " + elementType);
             }
         } finally {
             endWrite();
@@ -456,7 +460,8 @@ public class MemoryGraphStore implements IGraphStore {
             } else if (elementType.equals(Edge.class)) {
                 eIndexMap.dropKeyIndex(key);
             } else {
-                throw new BitsyException(BitsyErrorCodes.UNSUPPORTED_INDEX_TYPE, "Encountered index type: " + elementType);
+                throw new BitsyException(
+                        BitsyErrorCodes.UNSUPPORTED_INDEX_TYPE, "Encountered index type: " + elementType);
             }
         } finally {
             endWrite();
@@ -476,7 +481,8 @@ public class MemoryGraphStore implements IGraphStore {
             } else if (elementType.equals(Edge.class)) {
                 return eIndexMap.getIndexedKeys();
             } else {
-                throw new BitsyException(BitsyErrorCodes.UNSUPPORTED_INDEX_TYPE, "Encountered index type: " + elementType);
+                throw new BitsyException(
+                        BitsyErrorCodes.UNSUPPORTED_INDEX_TYPE, "Encountered index type: " + elementType);
             }
         } finally {
             endWrite();
@@ -513,7 +519,7 @@ public class MemoryGraphStore implements IGraphStore {
         } finally {
             endRead(retryDetails);
         }
-        
+
         return ans;
     }
 
@@ -521,43 +527,49 @@ public class MemoryGraphStore implements IGraphStore {
     public void shutdown() {
         reset();
     }
-    
+
     // HELPER METHODS
     public EdgeBean asBean(BitsyEdge edge) {
         // The TX is usually not active at this point. So no checks.
         VertexBean outVertexBean = getVertex(edge.getOutVertexId());
         VertexBean inVertexBean = getVertex(edge.getInVertexId());
-        
+
         if ((outVertexBean == null) || (inVertexBean == null)) {
             // The vertex has been deleted.
             return null;
         } else {
             assert (edge.getState() == BitsyState.M);
-            return new EdgeBean((UUID)edge.id(), edge.getPropertyDict(), edge.getVersion(), edge.label(), outVertexBean, inVertexBean);
+            return new EdgeBean(
+                    (UUID) edge.id(),
+                    edge.getPropertyDict(),
+                    edge.getVersion(),
+                    edge.label(),
+                    outVertexBean,
+                    inVertexBean);
         }
     }
 
     public EdgeBean asBean(BitsyEdge edge, IStringCanonicalizer canonicalizer) {
         EdgeBean ans = asBean(edge);
-        
+
         if (ans != null) {
             // Canonicalize the label
             ans.label = (ans.label == null) ? null : canonicalizer.canonicalize(ans.label);
         }
-        
+
         if (edge.getPropertyDict() != null) {
             edge.getPropertyDict().canonicalizeKeys(canonicalizer);
         }
-        
+
         return ans;
     }
-    
+
     // Retry details
     public class RetryDetails {
         long counter;
         long startCounter;
         int retryCount;
-        
+
         public RetryDetails() {
             this.startCounter = spinCounter.get();
             this.counter = startCounter;

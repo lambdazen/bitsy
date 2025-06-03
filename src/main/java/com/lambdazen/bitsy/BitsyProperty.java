@@ -25,11 +25,11 @@ public class BitsyProperty<T> implements Property<T> {
 
     @Override
     public T value() throws NoSuchElementException {
-    	if (removed) {
-    		throw new NoSuchElementException("This property is empty");
-    	} else {
-    		return value;
-    	}
+        if (removed) {
+            throw new NoSuchElementException("This property is empty");
+        } else {
+            return value;
+        }
     }
 
     @Override
@@ -44,10 +44,10 @@ public class BitsyProperty<T> implements Property<T> {
 
     @Override
     public void remove() {
-    	if (isPresent()) {
-    		element.removeProperty(key);
-    		this.removed = true;
-    	}
+        if (isPresent()) {
+            element.removeProperty(key);
+            this.removed = true;
+        }
     }
 
     // Moved to ElementHelper hashCode and equals in TP3

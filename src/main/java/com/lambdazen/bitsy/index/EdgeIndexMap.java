@@ -1,8 +1,7 @@
 package com.lambdazen.bitsy.index;
 
-import java.util.Iterator;
-
 import com.lambdazen.bitsy.store.EdgeBean;
+import java.util.Iterator;
 
 public class EdgeIndexMap extends BitsyIndexMap<EdgeBean, EdgeIndex> {
     public EdgeIndexMap() {

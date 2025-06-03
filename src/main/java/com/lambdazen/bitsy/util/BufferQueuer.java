@@ -7,5 +7,5 @@ import com.lambdazen.bitsy.util.DoubleBuffer.BufferName;
 public interface BufferQueuer<T> {
     // Any exception thrown by this method will stop further enqueues.
     // InterruptedExceptions must be rethrown to kill the flush thread
-    public void onQueue(BufferName bufName, T work) throws BitsyException; 
+    public void onQueue(BufferName bufName, T work) throws BitsyException;
 }

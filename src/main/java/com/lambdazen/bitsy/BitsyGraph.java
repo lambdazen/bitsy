@@ -1,5 +1,11 @@
 package com.lambdazen.bitsy;
 
+import com.lambdazen.bitsy.gremlin.BitsyTraversalStrategy;
+import com.lambdazen.bitsy.store.FileBackedMemoryGraphStore;
+import com.lambdazen.bitsy.store.MemoryGraphStore;
+import com.lambdazen.bitsy.tx.BitsyTransaction;
+import com.lambdazen.bitsy.tx.BitsyTransactionContext;
+import com.lambdazen.bitsy.wrapper.BitsyAutoReloadingGraph;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,11 +14,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-
 import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer;
@@ -26,13 +30,6 @@ import org.apache.tinkerpop.gremlin.structure.io.Io;
 import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.lambdazen.bitsy.gremlin.BitsyTraversalStrategy;
-import com.lambdazen.bitsy.store.FileBackedMemoryGraphStore;
-import com.lambdazen.bitsy.store.MemoryGraphStore;
-import com.lambdazen.bitsy.tx.BitsyTransaction;
-import com.lambdazen.bitsy.tx.BitsyTransactionContext;
-import com.lambdazen.bitsy.wrapper.BitsyAutoReloadingGraph;
 
 @Graph.OptIn("com.lambdazen.bitsy.structure.BitsyGraphStructureTestSuite")
 @Graph.OptIn("com.lambdazen.bitsy.structure.BitsyProcessStandardTestSuite")
@@ -69,8 +66,16 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
 
     static {
         try {
-            TraversalStrategies.GlobalCache.registerStrategies(BitsyGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone().addStrategies(BitsyTraversalStrategy.instance()));
-            TraversalStrategies.GlobalCache.registerStrategies(BitsyAutoReloadingGraph.class, TraversalStrategies.GlobalCache.getStrategies(Graph.class).clone().addStrategies(BitsyTraversalStrategy.instance()));
+            TraversalStrategies.GlobalCache.registerStrategies(
+                    BitsyGraph.class,
+                    TraversalStrategies.GlobalCache.getStrategies(Graph.class)
+                            .clone()
+                            .addStrategies(BitsyTraversalStrategy.instance()));
+            TraversalStrategies.GlobalCache.registerStrategies(
+                    BitsyAutoReloadingGraph.class,
+                    TraversalStrategies.GlobalCache.getStrategies(Graph.class)
+                            .clone()
+                            .addStrategies(BitsyTraversalStrategy.instance()));
         } catch (java.lang.BootstrapMethodError e) {
             // Known issue with Android
             System.err.println("Not registering traversal strategies");
@@ -115,7 +120,12 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
      * @param reorgFactor V/E reorgs are triggered when the size of the V/E files exceeds the initial size by (1 + factor)
      * @param createDirIfMissing create the Bitsy directory if it is missing
      */
-    public BitsyGraph(Path dbPath, boolean allowFullGraphScans, long txLogThreshold, double reorgFactor, boolean createDirIfMissing) {
+    public BitsyGraph(
+            Path dbPath,
+            boolean allowFullGraphScans,
+            long txLogThreshold,
+            double reorgFactor,
+            boolean createDirIfMissing) {
         this.dbPath = dbPath;
         this.allowFullGraphScans = allowFullGraphScans;
         this.curTransactionContext = new ThreadLocal<BitsyTransactionContext>();
@@ -124,41 +134,53 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
         this.createDirIfMissing = createDirIfMissing;
 
         if (IS_ANDROID) {
-                if (isPersistent()) {
-                    // Load from files
-                    this.graphStore = new FileBackedMemoryGraphStore(new MemoryGraphStore(allowFullGraphScans), dbPath, txLogThreshold, reorgFactor, createDirIfMissing);
-                } else {
-                    this.graphStore = new MemoryGraphStore(allowFullGraphScans);
-                }
+            if (isPersistent()) {
+                // Load from files
+                this.graphStore = new FileBackedMemoryGraphStore(
+                        new MemoryGraphStore(allowFullGraphScans),
+                        dbPath,
+                        txLogThreshold,
+                        reorgFactor,
+                        createDirIfMissing);
+            } else {
+                this.graphStore = new MemoryGraphStore(allowFullGraphScans);
+            }
         } else {
-                MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-                if (isPersistent()) {
-                    // Make sure that another BitsyGraph doesn't exist with the same path
-                    try {
-                        this.objectName = new ObjectName("com.lambdazen.bitsy", "path", ObjectName.quote(dbPath.toString()));
-                    } catch (MalformedObjectNameException e) {
-                        throw new BitsyException(BitsyErrorCodes.INTERNAL_ERROR, "Bug in quoting ObjectName", e);
-                    }
-
-                    // Check registry
-                    if (server.isRegistered(objectName)) {
-                        throw new BitsyException(BitsyErrorCodes.INSTANCE_ALREADY_EXISTS, "Path " + dbPath.toString());
-                    }
-
-                    // Load from files
-                    this.graphStore = new FileBackedMemoryGraphStore(new MemoryGraphStore(allowFullGraphScans), dbPath, txLogThreshold, reorgFactor, createDirIfMissing);
-                } else {
-                    this.graphStore = new MemoryGraphStore(allowFullGraphScans);
+            MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            if (isPersistent()) {
+                // Make sure that another BitsyGraph doesn't exist with the same path
+                try {
+                    this.objectName =
+                            new ObjectName("com.lambdazen.bitsy", "path", ObjectName.quote(dbPath.toString()));
+                } catch (MalformedObjectNameException e) {
+                    throw new BitsyException(BitsyErrorCodes.INTERNAL_ERROR, "Bug in quoting ObjectName", e);
                 }
 
-                // Register this to the MBeanServer
-                if (objectName != null) {
-                    try {
-                        server.registerMBean(this, objectName);
-                    } catch (Exception e) {
-                        throw new BitsyException(BitsyErrorCodes.ERROR_REGISTERING_TO_MBEAN_SERVER, "Encountered exception", e);
-                    }
+                // Check registry
+                if (server.isRegistered(objectName)) {
+                    throw new BitsyException(BitsyErrorCodes.INSTANCE_ALREADY_EXISTS, "Path " + dbPath.toString());
                 }
+
+                // Load from files
+                this.graphStore = new FileBackedMemoryGraphStore(
+                        new MemoryGraphStore(allowFullGraphScans),
+                        dbPath,
+                        txLogThreshold,
+                        reorgFactor,
+                        createDirIfMissing);
+            } else {
+                this.graphStore = new MemoryGraphStore(allowFullGraphScans);
+            }
+
+            // Register this to the MBeanServer
+            if (objectName != null) {
+                try {
+                    server.registerMBean(this, objectName);
+                } catch (Exception e) {
+                    throw new BitsyException(
+                            BitsyErrorCodes.ERROR_REGISTERING_TO_MBEAN_SERVER, "Encountered exception", e);
+                }
+            }
         }
 
         this.bitsyFeatures = new BitsyFeatures(isPersistent);
@@ -168,39 +190,40 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
      * Constructor with a Configuration object with String dbPath, boolean allowFullGraphScans, long txLogThreshold and double reorgFactor
      */
     public BitsyGraph(Configuration configuration) {
-        this(Paths.get(configuration.getString(DB_PATH_KEY)),
+        this(
+                Paths.get(configuration.getString(DB_PATH_KEY)),
                 configuration.getBoolean(ALLOW_FULL_GRAPH_SCANS_KEY, Boolean.TRUE),
                 configuration.getLong(TX_LOG_THRESHOLD_KEY, DEFAULT_TX_LOG_THRESHOLD),
                 configuration.getDouble(REORG_FACTOR_KEY, DEFAULT_REORG_FACTOR),
                 configuration.getBoolean(CREATE_DIR_IF_MISSING_KEY, false));
         String isoLevelStr = configuration.getString(DEFAULT_ISOLATION_LEVEL_KEY);
         if (isoLevelStr != null) {
-                setDefaultIsolationLevel(BitsyIsolationLevel.valueOf(isoLevelStr));
+            setDefaultIsolationLevel(BitsyIsolationLevel.valueOf(isoLevelStr));
         }
         String vertexIndices = configuration.getString(VERTEX_INDICES_KEY);
         if (vertexIndices != null) {
-                createIndices(Vertex.class, vertexIndices);
+            createIndices(Vertex.class, vertexIndices);
         }
         String edgeIndices = configuration.getString(EDGE_INDICES_KEY);
         if (edgeIndices != null) {
-                createIndices(Edge.class, edgeIndices);
+            createIndices(Edge.class, edgeIndices);
         }
         this.origConfig = configuration;
     }
 
-        private void createIndices(Class elemType, String vertexIndices) {
-                for (String indexKey : vertexIndices.split(",")) {
-                        try {
-                                createKeyIndex(indexKey.trim(), elemType);
-                        } catch (BitsyException ex) {
-                                if (ex.getErrorCode() == BitsyErrorCodes.INDEX_ALREADY_EXISTS) {
-                                        // That's fine
-                                } else {
-                                        throw ex;
-                                }
-                        }
+    private void createIndices(Class elemType, String vertexIndices) {
+        for (String indexKey : vertexIndices.split(",")) {
+            try {
+                createKeyIndex(indexKey.trim(), elemType);
+            } catch (BitsyException ex) {
+                if (ex.getErrorCode() == BitsyErrorCodes.INDEX_ALREADY_EXISTS) {
+                    // That's fine
+                } else {
+                    throw ex;
                 }
+            }
         }
+    }
 
     public static final BitsyGraph open(Configuration configuration) {
         return new BitsyGraph(configuration);
@@ -247,58 +270,78 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
 
     public double getReorgFactor() {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            return ((FileBackedMemoryGraphStore)graphStore).getVEReorgPotential().getFactor();
+            return ((FileBackedMemoryGraphStore) graphStore)
+                    .getVEReorgPotential()
+                    .getFactor();
         }
     }
 
     public void setReorgFactor(double factor) {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            ((FileBackedMemoryGraphStore)graphStore).getVEReorgPotential().setFactor(factor);
+            ((FileBackedMemoryGraphStore) graphStore).getVEReorgPotential().setFactor(factor);
         }
     }
 
     public int getMinLinesPerReorg() {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            return ((FileBackedMemoryGraphStore)graphStore).getVEReorgPotential().getMinLinesPerReorg();
+            return ((FileBackedMemoryGraphStore) graphStore)
+                    .getVEReorgPotential()
+                    .getMinLinesPerReorg();
         }
     }
 
     public void setMinLinesPerReorg(int minLinesPerReorg) {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Reorg factor is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            ((FileBackedMemoryGraphStore)graphStore).getVEReorgPotential().setMinLinesPerReorg(minLinesPerReorg);
+            ((FileBackedMemoryGraphStore) graphStore).getVEReorgPotential().setMinLinesPerReorg(minLinesPerReorg);
         }
     }
 
     public long getTxLogThreshold() {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            return ((FileBackedMemoryGraphStore)graphStore).getTxLogFlushPotential().getTxLogThreshold();
+            return ((FileBackedMemoryGraphStore) graphStore)
+                    .getTxLogFlushPotential()
+                    .getTxLogThreshold();
         }
     }
 
     public void setTxLogThreshold(long txLogThreshold) {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            ((FileBackedMemoryGraphStore)graphStore).getTxLogFlushPotential().setTxLogThreshold(txLogThreshold);
+            ((FileBackedMemoryGraphStore) graphStore).getTxLogFlushPotential().setTxLogThreshold(txLogThreshold);
         }
     }
 
     /** This method flushes the transaction log to the V/E text files */
     public void flushTxLog() {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            ((FileBackedMemoryGraphStore)graphStore).flushTxLog();
+            ((FileBackedMemoryGraphStore) graphStore).flushTxLog();
         }
     }
 
@@ -316,9 +359,11 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
      */
     public void backup(Path pathToDir) {
         if (!isPersistent()) {
-            throw new BitsyException(BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS, "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
+            throw new BitsyException(
+                    BitsyErrorCodes.OPERATION_UNDEFINED_FOR_NON_PERSISTENT_GRAPHS,
+                    "Transaction log threshold is only defined for persistent graphs (with a defined path to DB)");
         } else {
-            ((FileBackedMemoryGraphStore)graphStore).backup(pathToDir);
+            ((FileBackedMemoryGraphStore) graphStore).backup(pathToDir);
         }
     }
 
@@ -349,17 +394,21 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
     /* UNIMPLEMENTED OLAP METHODS */
     @Override
     public GraphComputer compute() {
-        throw new UnsupportedOperationException("Bitsy doesn't support the compute() method", new BitsyException(BitsyErrorCodes.NO_OLAP_SUPPORT));
+        throw new UnsupportedOperationException(
+                "Bitsy doesn't support the compute() method", new BitsyException(BitsyErrorCodes.NO_OLAP_SUPPORT));
     }
 
     @Override
     public GraphComputer compute(Class graphComputerClass) {
-        throw new UnsupportedOperationException("Bitsy doesn't support the compute() method", new BitsyException(BitsyErrorCodes.NO_OLAP_SUPPORT));
+        throw new UnsupportedOperationException(
+                "Bitsy doesn't support the compute() method", new BitsyException(BitsyErrorCodes.NO_OLAP_SUPPORT));
     }
 
     @Override
     public <I extends Io> I io(final Io.Builder<I> builder) {
-        return (I) builder.graph(this).onMapper(m -> m.addRegistry(BitsyIoRegistryV3d0.instance())).create();
+        return (I) builder.graph(this)
+                .onMapper(m -> m.addRegistry(BitsyIoRegistryV3d0.instance()))
+                .create();
     }
 
     /* FEATURES */
@@ -372,7 +421,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
     @Override
     public Configuration configuration() {
         if (this.origConfig != null) {
-                return this.origConfig;
+            return this.origConfig;
         } else {
             Configuration ans = new BaseConfiguration();
             ans.setProperty(DB_PATH_KEY, dbPath.toString());
@@ -391,36 +440,40 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
 
     private void validateHomogenousIds(final Object[] ids) {
         final Class firstClass = ids[0].getClass();
-        for (int i=1; i < ids.length; i++) {
-                Class curClass = ids[i].getClass();
-                if (!curClass.equals(firstClass)) {
-                        throw new IllegalArgumentException("Argument " + i  + " has class " + curClass + " which mismatches arg 0's class " + firstClass);
-                }
+        for (int i = 1; i < ids.length; i++) {
+            Class curClass = ids[i].getClass();
+            if (!curClass.equals(firstClass)) {
+                throw new IllegalArgumentException(
+                        "Argument " + i + " has class " + curClass + " which mismatches arg 0's class " + firstClass);
+            }
         }
     }
 
     @Override
     public Vertex addVertex(Object... keyValues) {
         if (keyValues == null) {
-                throw new IllegalArgumentException("Expecting non-null arguments in addVertex");
+            throw new IllegalArgumentException("Expecting non-null arguments in addVertex");
         } else if (keyValues.length % 2 == 1) {
-            throw new IllegalArgumentException("Expecting even number of items in the keyValue array. Found " + keyValues.length);
+            throw new IllegalArgumentException(
+                    "Expecting even number of items in the keyValue array. Found " + keyValues.length);
         }
 
         // Validate first
-        for (int i = 0; i < keyValues.length; i = i+2) {
-                if (keyValues[i] == T.id) {
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            if (keyValues[i] == T.id) {
                 // We don't support custom IDs
-                throw new UnsupportedOperationException("Encountered T.id in addVertex", new BitsyException(BitsyErrorCodes.NO_CUSTOM_ID_SUPPORT));
-                } else if (keyValues[i] == null) {
-                        throw new IllegalArgumentException("Encountered a null key in argument #" + i);
-                } else if (keyValues[i+1] == null) {
-                        throw new IllegalArgumentException("Encountered a null value in argument #" + i);
-                } else if (keyValues[i] == T.label) {
-                        // That's fine
-                } else if (!(keyValues[i] instanceof String)) {
-                        throw new IllegalArgumentException("Encountered a non-string key: " + keyValues[i] + " in argument #" + i);
-                }
+                throw new UnsupportedOperationException(
+                        "Encountered T.id in addVertex", new BitsyException(BitsyErrorCodes.NO_CUSTOM_ID_SUPPORT));
+            } else if (keyValues[i] == null) {
+                throw new IllegalArgumentException("Encountered a null key in argument #" + i);
+            } else if (keyValues[i + 1] == null) {
+                throw new IllegalArgumentException("Encountered a null value in argument #" + i);
+            } else if (keyValues[i] == T.label) {
+                // That's fine
+            } else if (!(keyValues[i] instanceof String)) {
+                throw new IllegalArgumentException(
+                        "Encountered a non-string key: " + keyValues[i] + " in argument #" + i);
+            }
         }
 
         // Do the work
@@ -428,13 +481,13 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
         BitsyTransaction tx = getTx();
         BitsyVertex vertex = new BitsyVertex(UUID.randomUUID(), label, null, tx, BitsyState.M, 0);
 
-        for (int i = 0; i < keyValues.length; i = i+2) {
-                if (keyValues[i] == T.label) {
-                        // Already found it
-                } else {
-                        String key = (String)keyValues[i];
-                        vertex.property(key, keyValues[i+1]);
-                }
+        for (int i = 0; i < keyValues.length; i = i + 2) {
+            if (keyValues[i] == T.label) {
+                // Already found it
+            } else {
+                String key = (String) keyValues[i];
+                vertex.property(key, keyValues[i + 1]);
+            }
         }
 
         tx.addVertex(vertex);
@@ -452,7 +505,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
             final ITransaction tx = getTx();
 
             return tx.getAllVertices();
-        } else if (vertexIds.length == 1 ) {
+        } else if (vertexIds.length == 1) {
             Vertex vertex = getVertex(vertexIds[0]);
             if (vertex == null) {
                 return Collections.<Vertex>emptyList().iterator();
@@ -460,7 +513,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
                 return Collections.singletonList(vertex).iterator();
             }
         } else {
-                validateHomogenousIds(vertexIds);
+            validateHomogenousIds(vertexIds);
             List<Vertex> ans = new ArrayList<Vertex>();
             for (Object vertexId : vertexIds) {
                 Vertex vertex = getVertex(vertexId);
@@ -479,12 +532,12 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
 
         Vertex ans;
         if (id instanceof UUID) {
-            ans = getTx().getVertex((UUID)id);
+            ans = getTx().getVertex((UUID) id);
         } else if (id instanceof String) {
             // Get the UUID from the string representation -- may fail
             UUID uuid;
             try {
-                uuid = UUID.fromString((String)id);
+                uuid = UUID.fromString((String) id);
             } catch (IllegalArgumentException e) {
                 // Decoding failed
                 return null;
@@ -492,7 +545,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
 
             ans = getTx().getVertex(uuid);
         } else if (id instanceof Vertex) {
-                return getTx().getVertex((UUID)((Vertex)id).id());
+            return getTx().getVertex((UUID) ((Vertex) id).id());
         } else {
             // Wrong type
             ans = null;
@@ -507,12 +560,12 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
         }
 
         if (id instanceof UUID) {
-            return getTx().getEdge((UUID)id);
+            return getTx().getEdge((UUID) id);
         } else if (id instanceof String) {
             // Get the UUID from the string representation -- may fail
             UUID uuid;
             try {
-                uuid = UUID.fromString((String)id);
+                uuid = UUID.fromString((String) id);
             } catch (IllegalArgumentException e) {
                 // Decoding failed
                 return null;
@@ -520,7 +573,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
 
             return getTx().getEdge(uuid);
         } else if (id instanceof Edge) {
-                return getTx().getEdge((UUID)((Edge)id).id());
+            return getTx().getEdge((UUID) ((Edge) id).id());
         } else {
             // Wrong type
             return null;
@@ -536,7 +589,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
             final ITransaction tx = getTx();
 
             return tx.getAllEdges();
-        } else if (edgeIds.length == 1 ) {
+        } else if (edgeIds.length == 1) {
             Edge edge = getEdge(edgeIds[0]);
             if (edge == null) {
                 return Collections.<Edge>emptyList().iterator();
@@ -544,7 +597,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
                 return Collections.singletonList(edge).iterator();
             }
         } else {
-                validateHomogenousIds(edgeIds);
+            validateHomogenousIds(edgeIds);
             List<Edge> ans = new ArrayList<Edge>();
             for (Object edgeId : edgeIds) {
                 Edge edge = getEdge(edgeId);
@@ -560,11 +613,11 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
     public void shutdown() {
         try {
             // As per Blueprints tests, shutdown() implies automatic commit
-                BitsyTransaction tx = curTransaction.get();
-                if ((tx != null) && tx.isOpen()) {
-                        tx.commit();
-                        tx = null;
-                }
+            BitsyTransaction tx = curTransaction.get();
+            if ((tx != null) && tx.isOpen()) {
+                tx.commit();
+                tx = null;
+            }
 
             // Shutdown the underlying store
             graphStore.shutdown();
@@ -621,13 +674,13 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
         return graphStore;
     }
 
-        @Override
-        public void close() throws Exception {
-                this.shutdown();
-        }
+    @Override
+    public void close() throws Exception {
+        this.shutdown();
+    }
 
-        @Override
-        public Variables variables() {
-                throw new UnsupportedOperationException("Bitsy doesn't support variables. Please store the data in a vertex");
-        }
+    @Override
+    public Variables variables() {
+        throw new UnsupportedOperationException("Bitsy doesn't support variables. Please store the data in a vertex");
+    }
 }

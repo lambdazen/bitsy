@@ -10,7 +10,7 @@ import java.util.Arrays;
  */
 public class ArraySet<T> implements Set<T> {
     int size;
-    Object[] elements; 
+    Object[] elements;
 
     public ArraySet(Object[] elements) {
         this(elements, elements.length);
@@ -20,8 +20,8 @@ public class ArraySet<T> implements Set<T> {
         this.size = size;
         this.elements = new Object[size + size / 2];
 
-        for (int i=0; i < size; i++) {
-            this.elements[i] = (T)elements[i];
+        for (int i = 0; i < size; i++) {
+            this.elements[i] = (T) elements[i];
         }
     }
 
@@ -38,7 +38,7 @@ public class ArraySet<T> implements Set<T> {
     @Override
     public Object removeElement(T elem) {
         // Go over elements and remove the one
-        for (int i=0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             if (elem.equals(elements[i])) {
                 if (i < size - 1) {
                     elements[i] = elements[size - 1];
@@ -46,31 +46,31 @@ public class ArraySet<T> implements Set<T> {
 
                 this.size--;
                 elements[size] = null;
-                
+
                 break;
             }
         }
-        
+
         if (size < 16) {
             return new Set24<T>(getElements());
         } else if (size < elements.length / 2) {
             // Using the constructor that cuts the size -- to avoid two array creations
             return new ArraySet<T>(elements, size);
         } else {
-            // Use the same object 
+            // Use the same object
             return this;
         }
     }
 
     @Override
     public Set<T> addElement(T elem) {
-        for (int i=0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             if (elem.equals(elements[i])) {
                 // Nothing to do
                 return this;
             }
         }
-        
+
         if (size < elements.length) {
             elements[size] = elem;
             this.size++;

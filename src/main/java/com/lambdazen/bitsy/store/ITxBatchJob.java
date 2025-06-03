@@ -1,5 +1,3 @@
 package com.lambdazen.bitsy.store;
 
-public interface ITxBatchJob {
-
-}
+public interface ITxBatchJob {}

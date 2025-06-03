@@ -1,38 +1,12 @@
 package com.lambdazen.bitsy.store;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.apache.tinkerpop.gremlin.structure.Direction;
-import org.apache.tinkerpop.gremlin.structure.Edge;
-import org.apache.tinkerpop.gremlin.structure.Element;
-import org.apache.tinkerpop.gremlin.structure.Vertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.lambdazen.bitsy.BitsyEdge;
 import com.lambdazen.bitsy.BitsyErrorCodes;
 import com.lambdazen.bitsy.BitsyException;
@@ -49,10 +23,35 @@ import com.lambdazen.bitsy.util.CommittableFileLog;
 import com.lambdazen.bitsy.util.DoubleBuffer;
 import com.lambdazen.bitsy.util.DoubleBuffer.BufferName;
 import com.lambdazen.bitsy.util.DoubleBufferWithExecWork;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.tinkerpop.gremlin.structure.Direction;
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Element;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This class represents a memory graph store that is backed by a durable files */
 public class FileBackedMemoryGraphStore implements IGraphStore {
-	private static final Logger log = LoggerFactory.getLogger(FileBackedMemoryGraphStore.class);
+    private static final Logger log = LoggerFactory.getLogger(FileBackedMemoryGraphStore.class);
 
     private static final String META_PREFIX = "meta";
     private static final String META_B_TXT = "metaB.txt";
@@ -63,20 +62,20 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
     private static final String V_A_TXT = "vA.txt";
     private static final String TX_B_TXT = "txB.txt";
     private static final String TX_A_TXT = "txA.txt";
-    
+
     // Commit 10K ops per load in the V/E files
     public static final int DEFAULT_LOAD_OPS_PER_COMMIT = 10000;
     public static final int DEFAULT_MIN_LINES_BEFORE_REORG = 1000;
-    
+
     public static final Random rand = new Random();
-    
-    public static final Charset utf8 = Charset.forName("utf-8");
+
+    public static final Charset utf8 = StandardCharsets.UTF_8;
     private static final int JOIN_TIMEOUT = 60000; // 1 minute
 
     private static AtomicInteger idCounter = new AtomicInteger(1);
     private static AtomicBoolean backupInProgress = new AtomicBoolean(false);
-    
-    private int id; 
+
+    private int id;
     private ObjectMapper mapper;
     private MemoryGraphStore memStore;
     private Path dbPath;
@@ -89,28 +88,33 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
     private CommittableFileLog eB;
     private CommittableFileLog mA;
     private CommittableFileLog mB;
-    
+
     private DoubleBuffer<TxUnit> txToTxLogBuf;
     private DoubleBufferWithExecWork<ITxBatchJob> txLogToVEBuf;
     private DoubleBufferWithExecWork<IVeReorgJob> veReorgBuf;
-    
+
     private TxLogFlushPotential txLogFlushPotential;
     private VEObsolescencePotential veReorgPotential;
-    
+
     private long logCounter;
 
     private BufferName lastFlushedBuffer = null;
-    private Object flushCompleteSignal = new Object(); 
-    
+    private Object flushCompleteSignal = new Object();
+
     // Major version number
-    public static String CURRENT_MAJOR_VERSION_NUMBER = "1.5"; 
+    public static String CURRENT_MAJOR_VERSION_NUMBER = "1.5";
     private String majorVersionNumber = "1.0";
 
     public FileBackedMemoryGraphStore(MemoryGraphStore memStore, Path dbPath, long txLogThreshold, double reorgFactor) {
-    	this(memStore, dbPath, txLogThreshold, reorgFactor, false);
+        this(memStore, dbPath, txLogThreshold, reorgFactor, false);
     }
-    
-    public FileBackedMemoryGraphStore(MemoryGraphStore memStore, Path dbPath, long txLogThreshold, double reorgFactor, boolean createDirIfMissing) {
+
+    public FileBackedMemoryGraphStore(
+            MemoryGraphStore memStore,
+            Path dbPath,
+            long txLogThreshold,
+            double reorgFactor,
+            boolean createDirIfMissing) {
         this.id = idCounter.getAndIncrement();
         this.memStore = memStore;
         this.dbPath = dbPath;
@@ -121,27 +125,31 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         builder.configure(SerializationFeature.INDENT_OUTPUT, false);
         builder.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         mapper = builder.build();
-        mapper.configOverride(Map.class).setInclude(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
+        mapper.configOverride(Map.class)
+                .setInclude(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
         mapper.setSerializationInclusion(Include.NON_NULL);
         mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator());
-        
+
         if (!dbPath.toFile().isDirectory()) {
-        	if (!createDirIfMissing) {
-        		throw new BitsyException(BitsyErrorCodes.BAD_DB_PATH, "Expecting " + dbPath + " to be a folder. Exists? " + dbPath.toFile().exists());
-        	} else {
-        		if (!dbPath.toFile().exists()) {
-        			try {
-        				Files.createDirectory(dbPath);
-        			} catch (IOException ex) {
-        				throw new BitsyException(BitsyErrorCodes.BAD_DB_PATH, "Couldn't create " + dbPath);
-        			}
-        		}
-        	}
+            if (!createDirIfMissing) {
+                throw new BitsyException(
+                        BitsyErrorCodes.BAD_DB_PATH,
+                        "Expecting " + dbPath + " to be a folder. Exists? "
+                                + dbPath.toFile().exists());
+            } else {
+                if (!dbPath.toFile().exists()) {
+                    try {
+                        Files.createDirectory(dbPath);
+                    } catch (IOException ex) {
+                        throw new BitsyException(BitsyErrorCodes.BAD_DB_PATH, "Couldn't create " + dbPath);
+                    }
+                }
+            }
         }
 
         // Start off the Log Counter as 1. openForRead() will update this to the maximum so far.
         this.logCounter = 1;
-        
+
         this.txA = openFileLog(TX_A_TXT, true);
         this.txB = openFileLog(TX_B_TXT, true);
         this.vA = openFileLog(V_A_TXT, false);
@@ -150,44 +158,59 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         this.eB = openFileLog(E_B_TXT, false);
         this.mA = openFileLog(META_A_TXT, false);
         this.mB = openFileLog(META_B_TXT, false);
-        
+
         log.debug("Initial log counter is {}", logCounter);
-        
+
         // Find the earlier of the two
         CommittableFileLog vToLoad = getEarlierBuffer(vA, vB);
         CommittableFileLog eToLoad = getEarlierBuffer(eA, eB);
         CommittableFileLog[] txToLoad = getOrderedTxLogs(txA, txB);
 
         List<CommittableFileLog> logsToLoad = new ArrayList<CommittableFileLog>();
-        
+
         logsToLoad.add(vToLoad);
         logsToLoad.add(eToLoad);
         logsToLoad.addAll(Arrays.asList(txToLoad));
 
         // Load the records from files to the memory graphs store
         log.debug("Loading logs in this order: {}", logsToLoad);
-        
+
         LoadTask loadTask;
         try {
-            loadTask = new LoadTask(logsToLoad.toArray(new CommittableFileLog[0]), (MemoryGraphStore)memStore, DEFAULT_LOAD_OPS_PER_COMMIT, mapper, false);
+            loadTask = new LoadTask(
+                    logsToLoad.toArray(new CommittableFileLog[0]),
+                    (MemoryGraphStore) memStore,
+                    DEFAULT_LOAD_OPS_PER_COMMIT,
+                    mapper,
+                    false);
             loadTask.run();
         } catch (BitsyException e) {
             // Failed -- not try in repair mode
             log.info("Loading the database failed -- Trying again in repair mode");
             memStore.reset();
-            loadTask = new LoadTask(logsToLoad.toArray(new CommittableFileLog[0]), (MemoryGraphStore)memStore, DEFAULT_LOAD_OPS_PER_COMMIT, mapper, true);
+            loadTask = new LoadTask(
+                    logsToLoad.toArray(new CommittableFileLog[0]),
+                    (MemoryGraphStore) memStore,
+                    DEFAULT_LOAD_OPS_PER_COMMIT,
+                    mapper,
+                    true);
             loadTask.run();
         }
 
         long initialVE = loadTask.getTotalVE();
-        
+
         loadVersionAndIndexes();
         if (!majorVersionNumber.equals(CURRENT_MAJOR_VERSION_NUMBER)) {
-            log.error("Can not load database with major version number {}. Expecting major version number {}", majorVersionNumber, CURRENT_MAJOR_VERSION_NUMBER);
-            
-            throw new BitsyException(BitsyErrorCodes.MAJOR_VERSION_MISMATCH, "Database has major version number " + majorVersionNumber + ". Expecting major version " + CURRENT_MAJOR_VERSION_NUMBER);
+            log.error(
+                    "Can not load database with major version number {}. Expecting major version number {}",
+                    majorVersionNumber,
+                    CURRENT_MAJOR_VERSION_NUMBER);
+
+            throw new BitsyException(
+                    BitsyErrorCodes.MAJOR_VERSION_MISMATCH,
+                    "Database has major version number " + majorVersionNumber + ". Expecting major version "
+                            + CURRENT_MAJOR_VERSION_NUMBER);
         }
-        
 
         // Find out the transaction log that must be queued into first
         BufferName txBufName = (txToLoad[1] == txA) ? BufferName.A : BufferName.B;
@@ -202,73 +225,80 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         prepareForAppend(vToLoad);
         prepareForAppend(eToLoad);
 
-        CompactAndCopyTask txFlushTask = new CompactAndCopyTask(new CommittableFileLog[] {txToFlush}, vToLoad, eToLoad, memStore, nextTxCounter);
+        CompactAndCopyTask txFlushTask =
+                new CompactAndCopyTask(new CommittableFileLog[] {txToFlush}, vToLoad, eToLoad, memStore, nextTxCounter);
         txFlushTask.run();
         if (txFlushTask.getOutputLines() > 0) {
             log.debug("Flushed partially flushed Tx Log {} to {} and {}", txToFlush, vToLoad, eToLoad);
         }
-        
-        // Clear the TX file 
+
+        // Clear the TX file
         txToFlush.openForOverwrite(logCounter++);
 
         // Clear the unused V and E buffers
-        CommittableFileLog vToClear = (vToLoad == vA) ? vB : vA; 
+        CommittableFileLog vToClear = (vToLoad == vA) ? vB : vA;
         CommittableFileLog eToClear = (eToLoad == eA) ? eB : eA;
         vToClear.openForOverwrite(null);
         eToClear.openForOverwrite(null);
-        
+
         // Find latest V and E buffers
         BufferName vBufName = (vToLoad == vA) ? BufferName.A : BufferName.B;
         BufferName eBufName = (eToLoad == eA) ? BufferName.A : BufferName.B;
-        
+
         // See if for some reason, the V and E files have been swapped. This could happen if a reorg happens partially
         if (vBufName != eBufName) {
             // Yes. Now the edge will flip from A to B or vice versa
-            CommittableFileLog eToSave = (eToLoad == eA) ? eB : eA; 
-            
+            CommittableFileLog eToSave = (eToLoad == eA) ? eB : eA;
+
             eToLoad.openForRead();
             eToSave.openForOverwrite(logCounter++);
-            
+
             log.info("Moving out-of-sync edge file from {} to {}", eToLoad, eToSave);
-            CompactAndCopyTask eCopyTask = new CompactAndCopyTask(new CommittableFileLog[] {eToLoad}, vToLoad, eToSave, memStore, nextTxCounter);
+            CompactAndCopyTask eCopyTask = new CompactAndCopyTask(
+                    new CommittableFileLog[] {eToLoad}, vToLoad, eToSave, memStore, nextTxCounter);
             eCopyTask.run();
-            
+
             eToLoad.openForOverwrite(null);
             eToLoad.close();
         }
-        
-        this.txToTxLogBuf = new DoubleBuffer<TxUnit>(new BufferPotential<TxUnit>() {
-            @Override
-            public boolean addWork(TxUnit newWork) {
-                return true;
-            }
-            
-            @Override
-            public void reset() {
-                // Nothing to do
-            }
-        }, new TxUnitFlusher(), "MemToTxLogWriter-" + id);
-        
+
+        this.txToTxLogBuf = new DoubleBuffer<TxUnit>(
+                new BufferPotential<TxUnit>() {
+                    @Override
+                    public boolean addWork(TxUnit newWork) {
+                        return true;
+                    }
+
+                    @Override
+                    public void reset() {
+                        // Nothing to do
+                    }
+                },
+                new TxUnitFlusher(),
+                "MemToTxLogWriter-" + id);
+
         this.txLogFlushPotential = new TxLogFlushPotential(txLogThreshold);
-        
-        this.txLogToVEBuf = new DoubleBufferWithExecWork<ITxBatchJob>(txLogFlushPotential, 
+
+        this.txLogToVEBuf = new DoubleBufferWithExecWork<ITxBatchJob>(
+                txLogFlushPotential,
                 new TxBatchQueuer(),
-                new TxBatchFlusher(), 
+                new TxBatchFlusher(),
                 "TxFlusher-" + id,
                 false, // Don't keep track of the list of all Txs written to log
                 false, // It is OK for the flusher and queuer to run at the same time
-                txBufName); // Start enqueuing into the Tx from the last start/stop 
-        
+                txBufName); // Start enqueuing into the Tx from the last start/stop
+
         this.veReorgPotential = new VEObsolescencePotential(DEFAULT_MIN_LINES_BEFORE_REORG, reorgFactor, initialVE);
-        this.veReorgBuf = new DoubleBufferWithExecWork<IVeReorgJob>(veReorgPotential, 
+        this.veReorgBuf = new DoubleBufferWithExecWork<IVeReorgJob>(
+                veReorgPotential,
                 new TxLogQueuer(),
-                new TxLogFlusher(), 
+                new TxLogFlusher(),
                 "VEReorg-" + id,
                 false, // Don't keep track of the entire list of TxLogs -- too much memory
                 true, // Ensure that the flusher and queuer don't run at the same time
-                vBufName); // Start enqueuing into the V/E file from the last start/stop 
+                vBufName); // Start enqueuing into the V/E file from the last start/stop
     }
-    
+
     public TxLogFlushPotential getTxLogFlushPotential() {
         return txLogFlushPotential;
     }
@@ -283,12 +313,12 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         try {
             inputLog.openForRead();
             String fileName = inputLog.getPath().toString();
-            
+
             int lineNo = 1;
             String line;
             while ((line = inputLog.readLine()) != null) {
                 Record rec = Record.parseRecord(line, lineNo++, fileName);
-                
+
                 if (rec.getType() == RecordType.I) {
                     IndexBean iBean = mapper.readValue(rec.getJson(), IndexBean.class);
 
@@ -296,20 +326,24 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                 } else if (rec.getType() == RecordType.M) {
                     this.majorVersionNumber = rec.getJson();
                 } else {
-                    throw new BitsyException(BitsyErrorCodes.DATABASE_IS_CORRUPT, "Only M and I records are valid in the metadata file. Found " + line + " in line number " + lineNo + " of file " + fileName);
+                    throw new BitsyException(
+                            BitsyErrorCodes.DATABASE_IS_CORRUPT,
+                            "Only M and I records are valid in the metadata file. Found " + line + " in line number "
+                                    + lineNo + " of file " + fileName);
                 }
             }
 
             inputLog.close();
         } catch (Exception e) {
             if (e instanceof BitsyException) {
-                throw (BitsyException)e;
+                throw (BitsyException) e;
             } else {
-                throw new BitsyException(BitsyErrorCodes.DATABASE_IS_CORRUPT, "Unable to load indexes due to the given exception", e);
+                throw new BitsyException(
+                        BitsyErrorCodes.DATABASE_IS_CORRUPT, "Unable to load indexes due to the given exception", e);
             }
         }
     }
-    
+
     private void saveVersionAndIndexes() {
         CommittableFileLog oldLog = getEarlierBuffer(mA, mB);
         CommittableFileLog outputLog = (oldLog == mA) ? mB : mA;
@@ -318,32 +352,36 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             outputLog.openForOverwrite(logCounter++);
 
             // Save the version
-            outputLog.append(Record.generateDBLine(RecordType.M, CURRENT_MAJOR_VERSION_NUMBER).getBytes(utf8));
+            outputLog.append(Record.generateDBLine(RecordType.M, CURRENT_MAJOR_VERSION_NUMBER)
+                    .getBytes(utf8));
 
             // Vertex indexes
             for (String key : memStore.getIndexedKeys(Vertex.class)) {
                 IndexBean indexBean = new IndexBean(0, key);
-                byte[] line = Record.generateDBLine(RecordType.I, mapper.writeValueAsString(indexBean)).getBytes(utf8);
+                byte[] line = Record.generateDBLine(RecordType.I, mapper.writeValueAsString(indexBean))
+                        .getBytes(utf8);
                 outputLog.append(line);
             }
-            
+
             // Edge indexes
             for (String key : memStore.getIndexedKeys(Edge.class)) {
                 IndexBean indexBean = new IndexBean(1, key);
-                byte[] line = Record.generateDBLine(RecordType.I, mapper.writeValueAsString(indexBean)).getBytes(utf8);
+                byte[] line = Record.generateDBLine(RecordType.I, mapper.writeValueAsString(indexBean))
+                        .getBytes(utf8);
                 outputLog.append(line);
             }
-            
+
             outputLog.commit();
             outputLog.close();
-            
+
             oldLog.openForOverwrite(null);
             oldLog.close();
         } catch (Exception e) {
             if (e instanceof BitsyException) {
-                throw (BitsyException)e;
+                throw (BitsyException) e;
             } else {
-                throw new BitsyException(BitsyErrorCodes.DATABASE_IS_CORRUPT, "Unable to load indexes due to the given exception", e);
+                throw new BitsyException(
+                        BitsyErrorCodes.DATABASE_IS_CORRUPT, "Unable to load indexes due to the given exception", e);
             }
         }
     }
@@ -352,9 +390,9 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         assert txLog1.getCounter() != null;
         assert txLog2.getCounter() != null;
         assert txLog1.getCounter().longValue() != txLog2.getCounter().longValue();
-                
+
         if (txLog1.getCounter().longValue() < txLog2.getCounter().longValue()) {
-            return new CommittableFileLog[] {txLog1, txLog2}; 
+            return new CommittableFileLog[] {txLog1, txLog2};
         } else {
             return new CommittableFileLog[] {txLog2, txLog1};
         }
@@ -367,7 +405,7 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             return log1;
         } else {
             assert log1.getCounter().longValue() != log2.getCounter().longValue();
-            
+
             return (log1.getCounter().longValue() < log2.getCounter().longValue()) ? log1 : log2;
         }
     }
@@ -375,13 +413,13 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
     public String toString() {
         return "FileBackedMemoryGraphStore-" + id + "(path = " + dbPath + ")";
     }
-    
+
     public void shutdown() {
         log.info("Stopping graph {}", toString());
         this.txLogToVEBuf.stop(JOIN_TIMEOUT);
         this.veReorgBuf.stop(JOIN_TIMEOUT);
         this.txToTxLogBuf.stop(JOIN_TIMEOUT);
-        
+
         txA.close();
         txB.close();
         vA.close();
@@ -391,14 +429,14 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         mA.close();
         mB.close();
 
-        this.memStore.shutdown(); 
+        this.memStore.shutdown();
     }
 
     private CommittableFileLog openFileLog(String fileName, boolean isTxLog) throws BitsyException {
         Path toOpen = dbPath.resolve(fileName);
         try {
             CommittableFileLog cfl = new CommittableFileLog(toOpen, isTxLog);
-            
+
             // First check if the file exists
             if (!cfl.exists()) {
                 // Otherwise create it using openForOverwrite
@@ -406,27 +444,28 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
 
                 // Set the version for meta files
                 if (fileName.startsWith(META_PREFIX)) {
-                    cfl.append(Record.generateDBLine(RecordType.M, CURRENT_MAJOR_VERSION_NUMBER).getBytes(utf8));
+                    cfl.append(Record.generateDBLine(RecordType.M, CURRENT_MAJOR_VERSION_NUMBER)
+                            .getBytes(utf8));
                 }
 
                 cfl.close();
             }
-            
+
             // Then open for read
             cfl.openForRead();
-            
+
             log.debug("Checking file: {} with log counter {}. Size = {}", cfl.getPath(), cfl.getCounter(), cfl.size());
-            
+
             if ((cfl.getCounter() != null) && (cfl.getCounter().longValue() >= logCounter)) {
                 this.logCounter = cfl.getCounter().longValue() + 1;
             }
-            
+
             return cfl;
         } catch (IOException e) {
             throw new BitsyException(BitsyErrorCodes.ERROR_INITIALIZING_DB_FILES, "File: " + toOpen, e);
         }
     }
-    
+
     private void prepareForAppend(CommittableFileLog cfl) {
         if (cfl.getCounter() == null) {
             // An empty file. Need to write the header first
@@ -436,7 +475,7 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             cfl.openForAppend();
         }
     }
-    
+
     @Override
     public VertexBean getVertex(UUID id) {
         return memStore.getVertex(id);
@@ -464,22 +503,23 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
 
     @Override
     public void commit(ICommitChanges changes) {
-        if ((changes.getVertexChanges().size() == 0) && (changes.getEdgeChanges().size() == 0)) {
+        if ((changes.getVertexChanges().size() == 0)
+                && (changes.getEdgeChanges().size() == 0)) {
             return;
         }
 
         // Phase I: Serialize the objects to make sure that they can go into the file
         TxUnit txw;
-        StringWriter lineOutput = new StringWriter(); // Reused for vertex and edge lines 
+        StringWriter lineOutput = new StringWriter(); // Reused for vertex and edge lines
         try {
             StringWriter vWriter = new StringWriter();
             for (BitsyVertex v : changes.getVertexChanges()) {
                 // Increment the version before the commit
                 v.incrementVersion();
-                
+
                 VertexBeanJson vBean = v.asJsonBean();
-                //vWriter.write(Record.generateDBLine(RecordType.V, mapper.writeValueAsString(vBean)));
-                
+                // vWriter.write(Record.generateDBLine(RecordType.V, mapper.writeValueAsString(vBean)));
+
                 Record.generateVertexLine(lineOutput, mapper, vBean);
                 vWriter.write(lineOutput.toString());
             }
@@ -490,17 +530,18 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                 e.incrementVersion();
 
                 EdgeBeanJson eBean = e.asJsonBean();
-                //eWriter.write(Record.generateDBLine(RecordType.E, mapper.writeValueAsString(eBean)));
-                
+                // eWriter.write(Record.generateDBLine(RecordType.E, mapper.writeValueAsString(eBean)));
+
                 Record.generateEdgeLine(lineOutput, mapper, eBean);
                 eWriter.write(lineOutput.toString());
             }
 
             byte[] vBytes = vWriter.getBuffer().toString().getBytes(utf8);
             byte[] eBytes = eWriter.getBuffer().toString().getBytes(utf8);
-            
-            // Transaction boundary. Has a random integer and its hashcode to verify end of Tx. 
-            byte[] tBytes = Record.generateDBLine(RecordType.T, "" + rand.nextInt()).getBytes(utf8);
+
+            // Transaction boundary. Has a random integer and its hashcode to verify end of Tx.
+            byte[] tBytes =
+                    Record.generateDBLine(RecordType.T, "" + rand.nextInt()).getBytes(utf8);
 
             txw = new TxUnit(ByteBuffer.wrap(vBytes), ByteBuffer.wrap(eBytes), ByteBuffer.wrap(tBytes));
         } catch (JsonProcessingException e) {
@@ -508,11 +549,11 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         } catch (IOException e) {
             throw new BitsyException(BitsyErrorCodes.INTERNAL_ERROR, "Unable to serialize to StringBuffer", e);
         }
-        
+
         // Phase II: Update the memory store and push the commits to the double
-        // buffer. The write-lock inside the commit() is active during the call to 
-        // add the transaction to the buffer. This ensures that the transactions 
-        // are written in the same order as they enter the memory store.  
+        // buffer. The write-lock inside the commit() is active during the call to
+        // add the transaction to the buffer. This ensures that the transactions
+        // are written in the same order as they enter the memory store.
         final TxUnit txwf = txw;
 
         // Note that the memory store reject the transaction by throwing an exception, such as BitsyRetryException
@@ -527,30 +568,33 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         try {
             txw.getCountDownLatch().await();
         } catch (InterruptedException e) {
-            BitsyException toThrow = new BitsyException(BitsyErrorCodes.TRANSACTION_INTERRUPTED, "Exception while waiting for transaction log to commit", e);
-            
+            BitsyException toThrow = new BitsyException(
+                    BitsyErrorCodes.TRANSACTION_INTERRUPTED,
+                    "Exception while waiting for transaction log to commit",
+                    e);
+
             log.error("Error while committing transaction", toThrow);
-            
+
             throw toThrow;
         }
-        
+
         BitsyException toThrow = txw.getException();
         if (toThrow != null) {
             throw toThrow;
         }
     }
-    
+
     /** This method flushes the transaction log to the V/E text files */
     public void flushTxLog() {
         synchronized (flushCompleteSignal) {
             BufferName enqueueBuffer;
             synchronized (txLogToVEBuf.getPot()) {
                 // Enqueue the backup task
-                enqueueBuffer = txLogToVEBuf.getEnqueueBuffer(); 
+                enqueueBuffer = txLogToVEBuf.getEnqueueBuffer();
                 FlushNowJob flushJob = new FlushNowJob();
                 txLogToVEBuf.addAndExecuteWork(flushJob);
             }
-            
+
             try {
                 do {
                     log.debug("Waiting for flush to complete in buffer {}", enqueueBuffer);
@@ -558,18 +602,21 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                     log.debug("Flush complete in buffer {}", lastFlushedBuffer);
                 } while (lastFlushedBuffer != enqueueBuffer);
             } catch (InterruptedException e) {
-                BitsyException toThrow = new BitsyException(BitsyErrorCodes.FLUSH_INTERRUPTED, "Exception while waiting for a transaction-log flush to be performed", e);
+                BitsyException toThrow = new BitsyException(
+                        BitsyErrorCodes.FLUSH_INTERRUPTED,
+                        "Exception while waiting for a transaction-log flush to be performed",
+                        e);
 
                 log.error("Error while flushing the transaction log", toThrow);
 
                 throw toThrow;
             }
-        }        
+        }
     }
-    
-    /** This method backs up the database while it is still operational. Only one backup can be in progress at a time. 
-     * 
-     * @param backupDir directory to which the database must be backed up. 
+
+    /** This method backs up the database while it is still operational. Only one backup can be in progress at a time.
+     *
+     * @param backupDir directory to which the database must be backed up.
      */
     public void backup(Path backupDir) {
         if (!backupInProgress.compareAndSet(false, true)) {
@@ -579,7 +626,8 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                 File backupDirFile = backupDir.toFile();
 
                 if (!backupDirFile.isDirectory()) {
-                    throw new BitsyException(BitsyErrorCodes.BAD_BACKUP_PATH, "Expecting " + backupDir + " to be a folder");
+                    throw new BitsyException(
+                            BitsyErrorCodes.BAD_BACKUP_PATH, "Expecting " + backupDir + " to be a folder");
                 }
 
                 // Flush the transaction buffer
@@ -588,18 +636,21 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                 // Enqueue the backup task
                 BackupJob backupJob = new BackupJob(backupDir);
                 veReorgBuf.addAndExecuteWork(backupJob);
-                
+
                 // Wait for the response
                 try {
                     backupJob.getCountDownLatch().await();
                 } catch (InterruptedException e) {
-                    BitsyException toThrow = new BitsyException(BitsyErrorCodes.BACKUP_INTERRUPTED, "Exception while waiting for a backup to be performed", e);
-                    
+                    BitsyException toThrow = new BitsyException(
+                            BitsyErrorCodes.BACKUP_INTERRUPTED,
+                            "Exception while waiting for a backup to be performed",
+                            e);
+
                     log.error("Error while backing up the database", toThrow);
-                    
+
                     throw toThrow;
                 }
-                
+
                 BitsyException toThrow = backupJob.getException();
                 if (toThrow != null) {
                     throw toThrow;
@@ -609,21 +660,20 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             }
         }
     }
-    
-    /** This class represents a "flush-now" action on the transaction log */ 
-    public class FlushNowJob implements ITxBatchJob {
 
-    }
-    
+    /** This class represents a "flush-now" action on the transaction log */
+    public class FlushNowJob implements ITxBatchJob {}
+
     /** This class handles the flushing of the Memory to TxLog double buffer */
     public class TxUnitFlusher implements BufferFlusher<TxUnit> {
         @Override
-        public void flushBuffer(BufferName bufName, final List<TxUnit> workList) throws BitsyException, InterruptedException {
-            // Queue the batch of transactions into the transaction log 
+        public void flushBuffer(BufferName bufName, final List<TxUnit> workList)
+                throws BitsyException, InterruptedException {
+            // Queue the batch of transactions into the transaction log
             txLogToVEBuf.addAndExecuteWork(new TxBatch(workList));
         }
     }
-    
+
     /** This class handles the queueing of the TxLog to VE files double buffer, which performs the actual work of the TxLogWriteFlusher */
     public class TxBatchQueuer implements BufferQueuer<ITxBatchJob> {
         @Override
@@ -633,7 +683,7 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             } else if (!(batchJob instanceof TxBatch)) {
                 log.error("Unsupported type of work in TxLogFlushPotential: {}", batchJob.getClass());
             } else {
-                TxBatch trans = (TxBatch)batchJob;
+                TxBatch trans = (TxBatch) batchJob;
 
                 CommittableFileLog cfl = (bufName == BufferName.A) ? txA : txB;
 
@@ -646,12 +696,12 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                         size += work.writeToFile(cfl);
                     }
 
-                    // Force the contents into the TA/B file 
+                    // Force the contents into the TA/B file
                     cfl.commit();
 
                     // Set the size to calculate potential
                     trans.setSize(size);
-                    
+
                     log.trace("Wrote {} bytes to {}", size, cfl.getPath());
                 } catch (BitsyException e) {
                     bex = e;
@@ -670,15 +720,15 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             }
         }
     }
-    
+
     /** This class handles the flushing of TxLog to VE double buffer */
     public class TxBatchFlusher implements BufferFlusher<ITxBatchJob> {
         @Override
         public void flushBuffer(BufferName bufName, List<ITxBatchJob> x) throws BitsyException {
             // Write the transaction log to the appropriate V/E files
-            CommittableFileLog txLogToFlush = (bufName == BufferName.A) ? txA : txB; 
+            CommittableFileLog txLogToFlush = (bufName == BufferName.A) ? txA : txB;
             veReorgBuf.addAndExecuteWork(new TxLog(txLogToFlush));
-            
+
             synchronized (flushCompleteSignal) {
                 // An explicit flush operation using flushTxLog() will wait for this signal
                 lastFlushedBuffer = bufName;
@@ -687,30 +737,31 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             }
         }
     }
-    
+
     /** This class handles the queueing of the TxLog to VE files double buffer, which performs the actual work of the TxLogWriteFlusher */
     public class TxLogQueuer implements BufferQueuer<IVeReorgJob> {
         @Override
         public void onQueue(BufferName bufName, IVeReorgJob job) throws BitsyException {
             CommittableFileLog cflV = (bufName == BufferName.A) ? vA : vB;
             CommittableFileLog cflE = (bufName == BufferName.A) ? eA : eB;
-            
+
             if (job instanceof TxLog) {
                 // A transaction log must be flushed to V/E text files
-                TxLog txLog = (TxLog)job;
+                TxLog txLog = (TxLog) job;
                 CommittableFileLog inputLog = txLog.getCommittableFileLog();
-                CommittableFileLog otherTxLog = (inputLog == txA) ? txB : txA; 
+                CommittableFileLog otherTxLog = (inputLog == txA) ? txB : txA;
 
                 prepareForAppend(cflV);
                 prepareForAppend(cflE);
 
-                inputLog.openForRead(); 
+                inputLog.openForRead();
 
                 // Move and compact the transaction log into the vertex and edge logs
                 Long nextTxCounter = otherTxLog.getCounter();
                 assert nextTxCounter != null;
 
-                CompactAndCopyTask cp = new CompactAndCopyTask(new CommittableFileLog[] {inputLog}, cflV, cflE, memStore, nextTxCounter);
+                CompactAndCopyTask cp = new CompactAndCopyTask(
+                        new CommittableFileLog[] {inputLog}, cflV, cflE, memStore, nextTxCounter);
                 cp.run();
 
                 log.debug("Done writing to: {} of size {}", cflV.getPath(), cflV.size());
@@ -721,10 +772,10 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                 // Zap the txLog for the next flush
                 log.debug("Zapping transaction log {}", inputLog);
                 inputLog.openForOverwrite(logCounter++);
-                
+
             } else if (job instanceof BackupJob) {
                 // A backup of V/E text files must be performed
-                BackupJob backupJob = (BackupJob)job;
+                BackupJob backupJob = (BackupJob) job;
                 Path backupDir = backupJob.getBackupDir();
 
                 try {
@@ -733,17 +784,17 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                     CommittableFileLog cflOutA = new CommittableFileLog(backupDir.resolve(Paths.get(TX_A_TXT)), true);
                     cflOutA.openForOverwrite(txACounter);
                     cflOutA.close();
-                    
+
                     Long txBCounter = txB.getCounter();
                     CommittableFileLog cflOutB = new CommittableFileLog(backupDir.resolve(Paths.get(TX_B_TXT)), true);
                     cflOutB.openForOverwrite(txBCounter);
                     cflOutB.close();
-                    
+
                     // 2. Copy V?.txt to VA.txt
                     cflV.close();
                     Path sourceV = cflV.getPath();
                     Path targetV = backupDir.resolve(Paths.get(V_A_TXT));
-                    
+
                     log.debug("Copying {} to {}", sourceV, targetV);
                     Files.copy(sourceV, targetV, StandardCopyOption.REPLACE_EXISTING);
 
@@ -751,7 +802,7 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                     cflE.close();
                     Path sourceE = cflE.getPath();
                     Path targetE = backupDir.resolve(Paths.get(E_A_TXT));
-                    
+
                     log.debug("Copying {} to {}", sourceE, targetE);
                     Files.copy(sourceE, targetE, StandardCopyOption.REPLACE_EXISTING);
 
@@ -767,16 +818,19 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
                         Files.copy(sourceM, targetM, StandardCopyOption.REPLACE_EXISTING);
                     }
                 } catch (Exception e) {
-                    backupJob.setException(new BitsyException(BitsyErrorCodes.BACKUP_FAILED, "Encountered exception while backing up the database to " + backupDir, e));
+                    backupJob.setException(new BitsyException(
+                            BitsyErrorCodes.BACKUP_FAILED,
+                            "Encountered exception while backing up the database to " + backupDir,
+                            e));
                 } finally {
                     backupJob.getCountDownLatch().countDown();
                 }
-                
+
                 log.info("Completed backup to directory {}", backupDir);
             }
         }
     }
-    
+
     /** This class handles the reorganization of the V and E A/B files */
     public class TxLogFlusher implements BufferFlusher<IVeReorgJob> {
         @Override
@@ -787,23 +841,29 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
             CommittableFileLog targetV = (bufName == BufferName.B) ? vA : vB;
             CommittableFileLog targetE = (bufName == BufferName.B) ? eA : eB;
 
-            log.debug("Re-organizing {} and {} into {} and {} respectively", sourceV.getPath(), sourceE.getPath(), targetV.getPath(), targetE.getPath());
-            
+            log.debug(
+                    "Re-organizing {} and {} into {} and {} respectively",
+                    sourceV.getPath(),
+                    sourceE.getPath(),
+                    targetV.getPath(),
+                    targetE.getPath());
+
             // Open the source files for reading
             sourceV.openForRead();
             sourceE.openForRead();
-            
+
             // Clear the target files and set the proper counter in the header
             targetV.openForOverwrite(logCounter++);
             targetE.openForOverwrite(logCounter++);
-            
+
             // Find the lesser of the two counters -- synchronization is not
             // needed because tx logs can't be flushed in the middle of a re-org
             Long nextTxCounter = getEarlierBuffer(txA, txB).getCounter();
             assert (nextTxCounter != null);
-            
+
             // Move and compact the source V/E files into the target V/E files
-            CompactAndCopyTask cp = new CompactAndCopyTask(new CommittableFileLog[] {sourceV, sourceE}, targetV, targetE, memStore, nextTxCounter);
+            CompactAndCopyTask cp = new CompactAndCopyTask(
+                    new CommittableFileLog[] {sourceV, sourceE}, targetV, targetE, memStore, nextTxCounter);
             cp.run();
 
             log.debug("Done writing to: {}. Post-reorg size {}", targetV.getPath(), targetV.size());
@@ -817,8 +877,8 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
 
             veReorgPotential.setOrigLines(cp.getOutputLines());
         }
-    } 
-    
+    }
+
     @Override
     public Collection<VertexBean> getAllVertices() {
         return memStore.getAllVertices();
@@ -832,7 +892,7 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
     @Override
     public synchronized <T extends Element> void createKeyIndex(String key, Class<T> elementType) {
         memStore.createKeyIndex(key, elementType);
-        
+
         // Rewrite the metadata file -- all metadata file ops are synchronized on the mA object
         synchronized (mA) {
             saveVersionAndIndexes();

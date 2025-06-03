@@ -8,14 +8,14 @@ import java.util.List;
  * supports a get that takes the classifier and returns the matches. This class
  * is NOT thread-safe, but can support multiple readers as long as there is only
  * one writer.
- * 
+ *
  * This class is used for two purposes. The first is to store adjacency lists by
  * label. The classifier picks up the label from the Edge. The second purpose is
  * to provide SetMax with a thread-safe HashSet implementation.
  */
 public class CompactMultiSetMax<C, T> {
     public static final int MIN_TO_RESIZE = 8;
-    
+
     int occupied = 0;
     boolean safe;
     Object[] elements;
@@ -25,16 +25,16 @@ public class CompactMultiSetMax<C, T> {
         this.occupied = 0;
         this.safe = safe;
     }
-    
+
     public int getOccupiedCells() {
         return this.occupied;
     }
-    
+
     public CompactMultiSetMax<C, T> add(T obj, ClassifierGetter<C, T> c) {
         Object classifier = c.getClassifier(obj);
 
         addElementNoRehash(classifier.hashCode(), obj);
-        
+
         int len = elements.length;
         if (occupied >= len - (len / 4)) { // 0.75 load factor
             return rehash(len * 2, c);
@@ -47,7 +47,7 @@ public class CompactMultiSetMax<C, T> {
         int index = (hashCode & 0x7FFFFFFF) % elements.length;
 
         if (elements[index] == null) {
-            occupied++; 
+            occupied++;
         }
 
         if (safe) {
@@ -59,14 +59,14 @@ public class CompactMultiSetMax<C, T> {
 
     private CompactMultiSetMax<C, T> rehash(int newLength, ClassifierGetter<C, T> c) {
         CompactMultiSetMax<C, T> ans = new CompactMultiSetMax<C, T>(newLength, safe); // use the same safe boolean
-        
+
         for (Object elem : elements) {
             for (Object item : CompactSet.getElements(elem)) {
-                Object classifier = c.getClassifier((T)item);
-                ans.addElementNoRehash(classifier.hashCode(), (T)item);
+                Object classifier = c.getClassifier((T) item);
+                ans.addElementNoRehash(classifier.hashCode(), (T) item);
             }
         }
-        
+
         return ans;
     }
 
@@ -86,9 +86,9 @@ public class CompactMultiSetMax<C, T> {
     protected void removeElementNoHash(int hashCode, T obj) {
         int index = (hashCode & 0x7FFFFFFF) % elements.length;
 
-        Object oldVal = elements[index]; 
+        Object oldVal = elements[index];
         if (oldVal == null) {
-            return; 
+            return;
         } else {
             Object newVal = CompactSet.<T>remove(oldVal, obj);
             elements[index] = newVal;
@@ -108,17 +108,17 @@ public class CompactMultiSetMax<C, T> {
             return getAllElements();
         } else {
             int index = (key.hashCode() & 0x7FFFFFFF) % elements.length;
-    
+
             return CompactSet.getElements(elements[index]);
         }
     }
-    
+
     public Object[] getAllElements() {
         List<Object> ans = new ArrayList<Object>();
 
-        for (int i=0; i < elements.length; i++) {
+        for (int i = 0; i < elements.length; i++) {
             Object elem = elements[i];
-            
+
             for (Object item : CompactSet.getElements(elem)) {
                 if (item != null) {
                     // This check is needed because item could be null when
@@ -130,14 +130,14 @@ public class CompactMultiSetMax<C, T> {
                 }
             }
         }
-        
+
         return ans.toArray();
     }
 
     // This method goes over the elements to see if this compact set can be fit inside a Set24
     public boolean sizeBiggerThan24() {
         int currentSize = 0;
-        for (int i=0; i < elements.length; i++) {
+        for (int i = 0; i < elements.length; i++) {
             Object elem = elements[i];
             if (elem == null) {
                 // Empty cell
@@ -149,14 +149,14 @@ public class CompactMultiSetMax<C, T> {
                 // Don't reorg till the SetMax reduces to Set24
                 return true;
             } else {
-                currentSize += CompactSet.size(elem); 
+                currentSize += CompactSet.size(elem);
             }
-            
+
             if (currentSize > 24) {
                 return true;
             }
         }
-        
+
         return false;
     }
 }

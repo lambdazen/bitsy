@@ -14,7 +14,7 @@ public class TxBatch implements ITxBatchJob {
         this.trans = trans;
         this.size = 0;
     }
-    
+
     public List<TxUnit> getTxUnitList() {
         return trans;
     }

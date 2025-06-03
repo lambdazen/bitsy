@@ -14,34 +14,32 @@ import org.apache.tinkerpop.gremlin.jsr223.AbstractGremlinPlugin;
 import org.apache.tinkerpop.gremlin.jsr223.DefaultImportCustomizer;
 import org.apache.tinkerpop.gremlin.jsr223.ImportCustomizer;
 
-public class BitsyGremlinPlugin
-    extends AbstractGremlinPlugin
-{
-  private static final String NAME = "lambdazen.bitsy";
+public class BitsyGremlinPlugin extends AbstractGremlinPlugin {
+    private static final String NAME = "lambdazen.bitsy";
 
-  private static ImportCustomizer imports() {
-    return DefaultImportCustomizer.build()
-        .addClassImports(
-            BitsyEdge.class,
-            BitsyElement.class,
-            BitsyGraph.class,
-            ThreadedBitsyGraph.class,
-            BitsyProperty.class,
-            BitsyVertex.class,
-            BitsyVertexProperty.class,
-            UUID.class,
-            BitsyTransaction.class,
-            BitsyIoRegistryV3d0.class
-        ).create();
-  }
+    private static ImportCustomizer imports() {
+        return DefaultImportCustomizer.build()
+                .addClassImports(
+                        BitsyEdge.class,
+                        BitsyElement.class,
+                        BitsyGraph.class,
+                        ThreadedBitsyGraph.class,
+                        BitsyProperty.class,
+                        BitsyVertex.class,
+                        BitsyVertexProperty.class,
+                        UUID.class,
+                        BitsyTransaction.class,
+                        BitsyIoRegistryV3d0.class)
+                .create();
+    }
 
-  private static final BitsyGremlinPlugin INSTANCE = new BitsyGremlinPlugin();
+    private static final BitsyGremlinPlugin INSTANCE = new BitsyGremlinPlugin();
 
-  public BitsyGremlinPlugin() {
-    super(NAME, imports());
-  }
+    public BitsyGremlinPlugin() {
+        super(NAME, imports());
+    }
 
-  public static BitsyGremlinPlugin instance() {
-    return INSTANCE;
-  }
+    public static BitsyGremlinPlugin instance() {
+        return INSTANCE;
+    }
 }

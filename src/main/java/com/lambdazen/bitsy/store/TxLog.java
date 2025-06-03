@@ -17,11 +17,11 @@ public class TxLog implements IVeReorgJob {
     public CommittableFileLog getCommittableFileLog() {
         return cfl;
     }
-    
+
     public void setReorgPotDiff(int rpd) {
         this.rpd = rpd;
     }
-    
+
     public int getReorgPotDiff() {
         return rpd;
     }

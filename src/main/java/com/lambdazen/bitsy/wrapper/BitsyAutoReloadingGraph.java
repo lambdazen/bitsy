@@ -1,17 +1,15 @@
 package com.lambdazen.bitsy.wrapper;
 
+import com.lambdazen.bitsy.BitsyEdge;
+import com.lambdazen.bitsy.BitsyGraph;
+import com.lambdazen.bitsy.BitsyVertex;
 import java.util.Iterator;
-
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tinkerpop.gremlin.process.computer.GraphComputer;
 import org.apache.tinkerpop.gremlin.structure.Edge;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Transaction;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
-
-import com.lambdazen.bitsy.BitsyEdge;
-import com.lambdazen.bitsy.BitsyGraph;
-import com.lambdazen.bitsy.BitsyVertex;
 
 public class BitsyAutoReloadingGraph implements Graph {
     private BitsyGraph graph;
@@ -33,54 +31,54 @@ public class BitsyAutoReloadingGraph implements Graph {
     }
 
     @Override
-        public Vertex addVertex(Object... keyValues) {
-        BitsyVertex base = (BitsyVertex)(graph.addVertex(keyValues));
+    public Vertex addVertex(Object... keyValues) {
+        BitsyVertex base = (BitsyVertex) (graph.addVertex(keyValues));
 
         return new BitsyAutoReloadingVertex(graph, base);
-        }
+    }
 
-        @Override
-        public <C extends GraphComputer> C compute(Class<C> graphComputerClass) throws IllegalArgumentException {
-                return (C)graph.compute(graphComputerClass);
-        }
+    @Override
+    public <C extends GraphComputer> C compute(Class<C> graphComputerClass) throws IllegalArgumentException {
+        return (C) graph.compute(graphComputerClass);
+    }
 
-        @Override
-        public GraphComputer compute() throws IllegalArgumentException {
-                return graph.compute();
-        }
+    @Override
+    public GraphComputer compute() throws IllegalArgumentException {
+        return graph.compute();
+    }
 
-        @Override
-        public Iterator<Vertex> vertices(Object... vertexIds) {
-                Iterator<Vertex> result = graph.vertices(vertexIds);
-                return new VertexIterator(graph, result);
-        }
+    @Override
+    public Iterator<Vertex> vertices(Object... vertexIds) {
+        Iterator<Vertex> result = graph.vertices(vertexIds);
+        return new VertexIterator(graph, result);
+    }
 
-        @Override
-        public Iterator<Edge> edges(Object... edgeIds) {
-                Iterator<Edge> result = graph.edges(edgeIds);
+    @Override
+    public Iterator<Edge> edges(Object... edgeIds) {
+        Iterator<Edge> result = graph.edges(edgeIds);
 
-                return new EdgeIterator(graph, result);
-        }
+        return new EdgeIterator(graph, result);
+    }
 
-        @Override
-        public Transaction tx() {
-                return graph.tx();
-        }
+    @Override
+    public Transaction tx() {
+        return graph.tx();
+    }
 
-        @Override
-        public void close() throws Exception {
-                graph.close();
-        }
+    @Override
+    public void close() throws Exception {
+        graph.close();
+    }
 
-        @Override
-        public Variables variables() {
-                return graph.variables();
-        }
+    @Override
+    public Variables variables() {
+        return graph.variables();
+    }
 
-        @Override
-        public Configuration configuration() {
-                return graph.configuration();
-        }
+    @Override
+    public Configuration configuration() {
+        return graph.configuration();
+    }
 
     @Override
     public Graph.Features features() {
@@ -103,7 +101,7 @@ public class BitsyAutoReloadingGraph implements Graph {
 
         @Override
         public Vertex next() {
-            return new BitsyAutoReloadingVertex(graph, (BitsyVertex)(iter.next()));
+            return new BitsyAutoReloadingVertex(graph, (BitsyVertex) (iter.next()));
         }
 
         @Override
@@ -128,7 +126,7 @@ public class BitsyAutoReloadingGraph implements Graph {
 
         @Override
         public Edge next() {
-            return new BitsyAutoReloadingEdge(graph, (BitsyEdge)(iter.next()));
+            return new BitsyAutoReloadingEdge(graph, (BitsyEdge) (iter.next()));
         }
 
         @Override
