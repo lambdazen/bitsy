@@ -8,11 +8,7 @@ Bitsy is a small, fast, embeddable, durable in-memory graph database that is com
 
 Tags are named release-[version]. Versions start with 3.0. For e.g., release-3.0
 
-A note on branch names:
-
-- master: Unstable snapshot of the software on the last-released major version
-- dev-[major-version]-branch: Contains newer major versions that are not ready for release. For e.g., dev-3.5-branch
-- release-[major-version].x-branch: Contains older major versions which are supported. For e.g., release-3.0-branch
+Development happens on `master` branch.
 
 ## Building it
 
@@ -34,5 +30,7 @@ mvn clean install
 For full build (will run UTs and ITs)
 
 ```
-mvn clean install -Dit
+mvn clean install -P run-its
 ```
+
+For publishing setup, see [parent POM](https://github.com/maveniverse/parent).
