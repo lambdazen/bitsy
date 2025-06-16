@@ -54,7 +54,7 @@
     <!-- versions -->
     <gremlin.version>3.7.3</gremlin.version>
     <slf4j.version>1.7.36</slf4j.version>
-    <jackson.version>2.19.0</jackson.version>
+    <jackson.version>2.19.1</jackson.version>
 
     <!-- JaCoCo: empty -->
     <jacocoAgentArg />
