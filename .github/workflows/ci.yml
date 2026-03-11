@@ -9,9 +9,9 @@ on:
 jobs:
   build:
     name: Verify
-    uses: maveniverse/parent/.github/workflows/ci.yml@release-39
+    uses: maveniverse/parent/.github/workflows/ci.yml@release-51
     with:
       maven-test-run: false # ITs are currently busted and needs to go to separate module
-      jdk-matrix: '[ "8", "17", "21", "24" ]'
-      maven-matrix: '[ "3.9.9" ]'
+      jdk-matrix: '[ "8", "17", "21", "25" ]'
+      maven-matrix: '[ "3.9.12" ]'
       maven-test: './mvnw clean verify -e -B -V -P run-its'

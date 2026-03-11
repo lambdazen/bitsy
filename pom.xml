@@ -5,7 +5,7 @@
   <parent>
     <groupId>eu.maveniverse.maven.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>39</version>
+    <version>51</version>
   </parent>
 
   <groupId>com.lambdazen.bitsy</groupId>
@@ -52,13 +52,24 @@
     <maven.compiler.release>8</maven.compiler.release>
 
     <!-- versions -->
-    <gremlin.version>3.7.3</gremlin.version>
+    <gremlin.version>3.7.5</gremlin.version>
     <slf4j.version>1.7.36</slf4j.version>
-    <jackson.version>2.19.0</jackson.version>
 
     <!-- JaCoCo: empty -->
     <jacocoAgentArg />
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.21.1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -70,19 +81,16 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
@@ -203,7 +211,7 @@
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.13</version>
+          <version>0.8.14</version>
           <configuration>
             <propertyName>jacocoAgentArg</propertyName>
           </configuration>
