@@ -52,7 +52,7 @@
     <maven.compiler.release>8</maven.compiler.release>
 
     <!-- versions -->
-    <gremlin.version>3.7.5</gremlin.version>
+    <gremlin.version>3.8.1</gremlin.version>
     <slf4j.version>1.7.36</slf4j.version>
 
     <!-- JaCoCo: empty -->
