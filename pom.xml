@@ -5,7 +5,7 @@
   <parent>
     <groupId>eu.maveniverse.maven.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>51</version>
+    <version>55</version>
   </parent>
 
   <groupId>com.lambdazen.bitsy</groupId>
@@ -52,7 +52,7 @@
     <maven.compiler.release>8</maven.compiler.release>
 
     <!-- versions -->
-    <gremlin.version>3.7.5</gremlin.version>
+    <gremlin.version>3.8.1</gremlin.version>
     <slf4j.version>1.7.36</slf4j.version>
 
     <!-- JaCoCo: empty -->
@@ -62,9 +62,9 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>2.21.1</version>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>2.22.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

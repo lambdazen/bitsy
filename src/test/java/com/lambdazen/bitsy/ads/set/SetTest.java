@@ -1,7 +1,7 @@
 package com.lambdazen.bitsy.ads.set;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -208,8 +208,8 @@ public class SetTest extends TestCase {
         List myKeys = Arrays.asList(keys);
         List refKeys = Arrays.asList(reference.toArray());
 
-        Collections.sort(myKeys);
-        Collections.sort(refKeys);
+        myKeys.sort(Comparator.naturalOrder());
+        refKeys.sort(Comparator.naturalOrder());
 
         assertEquals(reference.size(), keys.length);
         assertEquals(reference.size(), CompactSet.size(set));

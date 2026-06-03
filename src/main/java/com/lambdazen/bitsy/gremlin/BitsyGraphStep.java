@@ -23,7 +23,7 @@ import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 import org.apache.tinkerpop.gremlin.util.iterator.IteratorUtils;
 
 // Bitsy graph step based Tinkerpop's Neo4j implementation
-public final class BitsyGraphStep<S, E extends Element> extends GraphStep<S, E> implements HasContainerHolder {
+public final class BitsyGraphStep<S, E extends Element> extends GraphStep<S, E> implements HasContainerHolder<S, E> {
 
     private final List<HasContainer> hasContainers = new ArrayList<>();
 

@@ -3,7 +3,6 @@ package com.lambdazen.bitsy.gremlin;
 import org.apache.tinkerpop.gremlin.process.traversal.Step;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategy;
-import org.apache.tinkerpop.gremlin.process.traversal.step.HasContainerHolder;
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter.HasStep;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.NoOpBarrierStep;
@@ -22,12 +21,12 @@ public class BitsyTraversalStrategy extends AbstractTraversalStrategy<TraversalS
     @Override
     public void apply(final Traversal.Admin<?, ?> traversal) {
         for (final GraphStep originalGraphStep : TraversalHelper.getStepsOfClass(GraphStep.class, traversal)) {
-            final BitsyGraphStep<?, ?> bitsyGraphStep = new BitsyGraphStep<>(originalGraphStep);
+            final BitsyGraphStep bitsyGraphStep = new BitsyGraphStep<>(originalGraphStep);
             TraversalHelper.replaceStep(originalGraphStep, bitsyGraphStep, traversal);
-            Step<?, ?> currentStep = bitsyGraphStep.getNextStep();
+            Step currentStep = bitsyGraphStep.getNextStep();
             while (currentStep instanceof HasStep || currentStep instanceof NoOpBarrierStep) {
                 if (currentStep instanceof HasStep) {
-                    for (final HasContainer hasContainer : ((HasContainerHolder) currentStep).getHasContainers()) {
+                    for (final HasContainer hasContainer : ((HasStep<?>) currentStep).getHasContainers()) {
                         if (!GraphStep.processHasContainerIds(bitsyGraphStep, hasContainer))
                             bitsyGraphStep.addHasContainer(hasContainer);
                     }
