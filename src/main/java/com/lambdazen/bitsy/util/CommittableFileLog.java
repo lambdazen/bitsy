@@ -81,7 +81,7 @@ public class CommittableFileLog {
         while (!endReached) {
             if (charBuf == null) { //  || (charBuf.length() <= index)
                 // Read next
-                byteBuf.clear();
+                clear(byteBuf);
                 int bytesRead;
                 try {
                     bytesRead = fileChannel.read(byteBuf);
@@ -100,7 +100,7 @@ public class CommittableFileLog {
                 }
 
                 // Get more chars into the buffer
-                byteBuf.flip();
+                flip(byteBuf);
 
                 charBuf = FileBackedMemoryGraphStore.utf8.decode(byteBuf);
 
@@ -389,6 +389,7 @@ public class CommittableFileLog {
         }
     }
 
+    @Override
     public String toString() {
         return "CommittableFileLog(" + filePath + ")";
     }
@@ -407,5 +408,13 @@ public class CommittableFileLog {
 
     public static void setLockMode(boolean b) {
         LOCK_MODE = b;
+    }
+
+    private static void clear(ByteBuffer buffer) {
+        buffer.clear();
+    }
+
+    private static void flip(ByteBuffer buffer) {
+        buffer.flip();
     }
 }
