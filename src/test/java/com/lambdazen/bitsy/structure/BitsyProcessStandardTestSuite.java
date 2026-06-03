@@ -54,7 +54,6 @@ import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.InjectTest
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SackTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SideEffectCapTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SideEffectTest;
-import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.StoreTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.SubgraphTest;
 import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.TreeTest;
 import org.junit.runner.RunWith;
@@ -215,7 +214,6 @@ public class BitsyProcessStandardTestSuite extends AbstractGremlinSuite {
         SackTest.class,
         SideEffectCapTest.class,
         SideEffectTest.class,
-        StoreTest.class,
         SubgraphTest.class,
         TreeTest.class,
     };
