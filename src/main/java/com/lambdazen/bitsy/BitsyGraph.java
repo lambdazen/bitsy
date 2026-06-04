@@ -405,6 +405,7 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public <I extends Io> I io(final Io.Builder<I> builder) {
         return (I) builder.graph(this)
                 .onMapper(m -> m.addRegistry(BitsyIoRegistryV3d0.instance()))
@@ -435,17 +436,6 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
             ans.setProperty(EDGE_INDICES_KEY, String.join(",", getIndexedKeys(Vertex.class)));
 
             return ans;
-        }
-    }
-
-    private void validateHomogenousIds(final Object[] ids) {
-        final Class firstClass = ids[0].getClass();
-        for (int i = 1; i < ids.length; i++) {
-            Class curClass = ids[i].getClass();
-            if (!curClass.equals(firstClass)) {
-                throw new IllegalArgumentException(
-                        "Argument " + i + " has class " + curClass + " which mismatches arg 0's class " + firstClass);
-            }
         }
     }
 
@@ -513,7 +503,6 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
                 return Collections.singletonList(vertex).iterator();
             }
         } else {
-            validateHomogenousIds(vertexIds);
             List<Vertex> ans = new ArrayList<Vertex>();
             for (Object vertexId : vertexIds) {
                 Vertex vertex = getVertex(vertexId);
@@ -597,7 +586,6 @@ public class BitsyGraph implements Graph, BitsyGraphMBean {
                 return Collections.singletonList(edge).iterator();
             }
         } else {
-            validateHomogenousIds(edgeIds);
             List<Edge> ans = new ArrayList<Edge>();
             for (Object edgeId : edgeIds) {
                 Edge edge = getEdge(edgeId);

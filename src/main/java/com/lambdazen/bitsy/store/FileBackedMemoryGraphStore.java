@@ -124,10 +124,10 @@ public class FileBackedMemoryGraphStore implements IGraphStore {
         // Indentation must be turned off
         builder.configure(SerializationFeature.INDENT_OUTPUT, false);
         builder.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        builder.defaultPropertyInclusion(JsonInclude.Value.construct(Include.NON_NULL, Include.NON_NULL));
         mapper = builder.build();
         mapper.configOverride(Map.class)
                 .setInclude(JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.NON_NULL));
-        mapper.setSerializationInclusion(Include.NON_NULL);
         mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator());
 
         if (!dbPath.toFile().isDirectory()) {

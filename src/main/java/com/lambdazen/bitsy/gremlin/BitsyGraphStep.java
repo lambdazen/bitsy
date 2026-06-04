@@ -54,8 +54,10 @@ public final class BitsyGraphStep<S, E extends Element> extends GraphStep<S, E> 
 
     private Iterator<Vertex> lookupVertices(
             final BitsyGraph graph, final List<HasContainer> hasContainers, final Object... ids) {
+        // ids == null signals an empty-set hasId predicate (e.g. hasId(within([]))) — no results
+        if (ids == null) return Collections.emptyIterator();
         // ids are present, filter on them first
-        if (ids != null && ids.length > 0)
+        if (ids.length > 0)
             return IteratorUtils.filter(graph.vertices(ids), vertex -> HasContainer.testAll(vertex, hasContainers));
 
         // Labels aren't indexed in Bitsy, only keys -- so do a full scan
@@ -82,8 +84,10 @@ public final class BitsyGraphStep<S, E extends Element> extends GraphStep<S, E> 
 
     private Iterator<Edge> lookupEdges(
             final BitsyGraph graph, final List<HasContainer> hasContainers, final Object... ids) {
+        // ids == null signals an empty-set hasId predicate (e.g. hasId(within([]))) — no results
+        if (ids == null) return Collections.emptyIterator();
         // ids are present, filter on them first
-        if (ids != null && ids.length > 0)
+        if (ids.length > 0)
             return IteratorUtils.filter(graph.edges(ids), vertex -> HasContainer.testAll(vertex, hasContainers));
 
         // Labels aren't indexed in Bitsy, only keys -- so do a full scan
