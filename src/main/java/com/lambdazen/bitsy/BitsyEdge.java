@@ -39,7 +39,7 @@ public class BitsyEdge extends BitsyElement implements Edge, IEdge {
 
     public BitsyEdge(EdgeBean bean, BitsyTransaction tx, BitsyState state) {
         this(
-                bean.getId(),
+                new UUID(bean.getMostSignificantBits(), bean.getLeastSignificantBits()),
                 bean.getPropertiesDict(),
                 tx,
                 state,

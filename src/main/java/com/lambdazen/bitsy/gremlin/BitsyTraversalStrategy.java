@@ -1,11 +1,14 @@
 package com.lambdazen.bitsy.gremlin;
 
+import com.lambdazen.bitsy.BitsyIoRegistryV3d0;
+import org.apache.tinkerpop.gremlin.process.traversal.IO;
 import org.apache.tinkerpop.gremlin.process.traversal.Step;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.TraversalStrategy;
 import org.apache.tinkerpop.gremlin.process.traversal.step.filter.HasStep;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.GraphStep;
 import org.apache.tinkerpop.gremlin.process.traversal.step.map.NoOpBarrierStep;
+import org.apache.tinkerpop.gremlin.process.traversal.step.sideEffect.IoStep;
 import org.apache.tinkerpop.gremlin.process.traversal.step.util.HasContainer;
 import org.apache.tinkerpop.gremlin.process.traversal.strategy.AbstractTraversalStrategy;
 import org.apache.tinkerpop.gremlin.process.traversal.util.TraversalHelper;
@@ -20,6 +23,9 @@ public class BitsyTraversalStrategy extends AbstractTraversalStrategy<TraversalS
 
     @Override
     public void apply(final Traversal.Admin<?, ?> traversal) {
+        for (final IoStep<?> ioStep : TraversalHelper.getStepsOfClass(IoStep.class, traversal)) {
+            ioStep.configure(IO.registry, BitsyIoRegistryV3d0.instance());
+        }
         for (final GraphStep originalGraphStep : TraversalHelper.getStepsOfClass(GraphStep.class, traversal)) {
             final BitsyGraphStep bitsyGraphStep = new BitsyGraphStep<>(originalGraphStep);
             TraversalHelper.replaceStep(originalGraphStep, bitsyGraphStep, traversal);

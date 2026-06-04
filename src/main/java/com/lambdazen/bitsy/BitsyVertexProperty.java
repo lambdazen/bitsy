@@ -3,9 +3,11 @@ package com.lambdazen.bitsy;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
+import org.apache.tinkerpop.gremlin.structure.Element;
 import org.apache.tinkerpop.gremlin.structure.Property;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.VertexProperty;
+import org.apache.tinkerpop.gremlin.structure.util.ElementHelper;
 import org.apache.tinkerpop.gremlin.structure.util.StringFactory;
 
 public class BitsyVertexProperty<V> extends BitsyProperty<V> implements VertexProperty<V> {
@@ -41,6 +43,16 @@ public class BitsyVertexProperty<V> extends BitsyProperty<V> implements VertexPr
     @Override
     public Object id() {
         return element().id().toString() + ":" + key();
+    }
+
+    @Override
+    public int hashCode() {
+        return ElementHelper.hashCode((Element) this);
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return ElementHelper.areEqual((VertexProperty) this, object);
     }
 
     public String toString() {

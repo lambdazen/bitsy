@@ -25,7 +25,13 @@ public class BitsyVertex extends BitsyElement implements Vertex {
     }
 
     public BitsyVertex(VertexBean bean, BitsyTransaction tx, BitsyState state) {
-        this(bean.getId(), bean.getLabel(), bean.getPropertiesDict(), tx, state, bean.getVersion());
+        this(
+                new UUID(bean.getMostSignificantBits(), bean.getLeastSignificantBits()),
+                bean.getLabel(),
+                bean.getPropertiesDict(),
+                tx,
+                state,
+                bean.getVersion());
     }
 
     @Override
