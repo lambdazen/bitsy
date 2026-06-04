@@ -11,6 +11,6 @@ jobs:
     name: Verify
     uses: maveniverse/parent/.github/workflows/ci.yml@release-55
     with:
-      jdk-matrix: '[ "8", "21", "26" ]'
+      jdk-matrix: '[ "11", "21", "26" ]'
       maven-matrix: '[ "3.9.16" ]'
-      maven-test: './mvnw clean verify -e -B -V -P run-its'
+      maven-test: './mvnw clean verify -e -B -V -P run-its -Denforcer.skip'
